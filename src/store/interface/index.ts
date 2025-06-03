@@ -50,6 +50,7 @@ export interface PermissionState {
   homePath: string
   buttonList: string[]
   menuList: Menu.MenuOptions[]
+  breadcrumbList: { [key: string]: any } // 添加面包屑列表类型
 }
 
 // locale
@@ -65,10 +66,14 @@ export interface LocaleDropdownType {
 }
 
 export interface UserinfoType {
-  avatar: string
-  createTime: any
-  pkId: number
-  roleId: number
-  status: number
+  id: number
   username: string
+  phone: string
+  nickname: string
+  avatarUrl: string
+  tenantId: number
+  role: number // 1: 超级管理员, 2: 租户管理员, 3: 普通用户
+  status: number
+  permissions?: string // JSON字符串
+  createTime?: string
 }

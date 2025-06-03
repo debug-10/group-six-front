@@ -28,121 +28,64 @@ export namespace Login {
   export interface ReqLoginForm {
     username: string
     password: string
-    // key: string
-    // captcha: string
   }
   export interface ResLogin {
     access_token: string
+    user: {
+      id: number
+      username: string
+      phone: string
+      nickname: string
+      avatarUrl: string
+      tenantId: number
+      role: number // 1: 超级管理员, 2: 租户管理员, 3: 普通用户
+      status: number
+      permissions?: string // JSON字符串，存储用户权限
+    }
   }
-  // export interface ResLoginCaptcha {
-  //   key: string
-  //   image: string
-  // }
 }
 
 // * 管理员管理模块
 export namespace SysManager {
   export interface ReqGetManagerParams extends ReqPage {
     username?: string
+    phone?: string
+    nickname?: string
+    tenantId?: number
+    role?: number
+    status?: number
   }
+
   export interface ResManagerList {
-    pkId: number
+    id: number
     username: string
-    avatar: string
+    phone: string
+    nickname: string
+    avatarUrl: string
     status: number
     createTime: string
+    tenantId: number
+    role: number
+    permissions?: string // 保留权限字段
   }
+
   export interface ReqEditManagerParams {
-    pkId?: number
+    id?: number
     username: string
-    avatar: string
+    phone?: string
+    nickname?: string
+    avatarUrl?: string
     status: number
-    roleId: number
+    tenantId?: number
+    role: number
     password?: string
+    submitPassword?: string // 用于确认密码
+    permissions?: string // 保留权限字段
   }
 
   export interface ReqEditPasswordParams {
-    password?: string
-    code?: string
+    id: number
+    oldPassword: string
+    newPassword: string
   }
-}
-
-// * 角色模块
-export namespace SysRole {
-  export interface ReqGetRoleParams extends ReqPage {
-    name?: string
-  }
-  export interface ResRoleList {
-    pkId: number
-    name: string
-    remark: string
-    menuIds: number[]
-    createTime: string
-  }
-  export interface ReqEditRoleParams {
-    pkId?: number
-    name: string
-    remark: string
-    menuIds: number[]
-  }
-}
-
-// * 菜单模块
-export namespace SysMenu {
-  export interface ReqLoginForm {
-    username: string
-    password: string
-  }
-  export interface ResMenuList {
-    title: string
-    pkId: number
-    pid: number
-    path: string
-    name: string
-    icon: string
-    component?: string
-    type: 'MENU_DIR' | 'MENU' | 'BUTTON'
-    openType: 'TAB' | 'URL'
-    url?: string
-    auth?: string
-    keepalive: boolean
-    sort: number
-    parentName: String
-    children: ResMenuList[]
-    hide?: boolean
-  }
-}
-
-// * 文件上传模块
-export namespace Upload {
-  export interface ResFileUrl {
-    fileUrl: string
-  }
-}
-
-// * 字典
-export interface Dict {
-  id: number
-  title: string
-  updateTime: string
-  value: number
-}
-
-/** 字典设置 */
-export interface DictConfigRes {
-  createTime: string
-  dictNumber: string
-  id: number
-  title: string
-  updateTime: string
-  value: number
-}
-
-export interface Category {
-  pkId: number // 分类唯一标识
-  title: string // 分类名称
-  type: number // 分类类型
-  description: string
-  createTime: string // 创建时间
-  updateTime: string // 更新时间
 }

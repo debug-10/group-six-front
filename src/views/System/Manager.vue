@@ -9,11 +9,13 @@
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-hasPermi="['sys:manager:view']">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)" v-hasPermi="['sys:manager:edit']">编辑</el-button>
+        <el-button type="success" link :icon="Setting" @click="openRoleAssign(scope.row)" v-hasPermi="['sys:manager:assign-role']">权限分配</el-button>
         <el-button type="warning" link :icon="EditPen" @click="openDrawer('重置', scope.row)" v-hasPermi="['sys:manager:reset-psw']">重置密码</el-button>
         <el-button type="danger" link :icon="Delete" @click="deleteAccount(scope.row)" v-hasPermi="['sys:manager:remove']">删除</el-button>
       </template>
     </ProTable>
     <ManagerDialog ref="dialogRef" />
+    <RoleAssignDialog ref="roleAssignRef" @refresh="refreshTable" />
   </div>
 </template>
 
@@ -25,17 +27,16 @@ import { useHandleData } from '@/hooks/useHandleData'
 import { useAuthButtons } from '@/hooks/useAuthButtons'
 import ProTable from '@/components/ProTable/index.vue'
 import ManagerDialog from '@/views/System/components/ManagerDialog.vue'
-import { CirclePlus, Delete, EditPen, View } from '@element-plus/icons-vue'
+import RoleAssignDialog from '@/views/System/components/RoleAssignDialog.vue'
 import { getManagerPage, addManager, editManager, deleteManager } from '@/api/modules/manager'
-import { getRoleList } from '@/api/modules/role'
 
-// 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
+// 获取 ProTable 元素，调用其获取刷新数据方法
 const proTable = ref()
 
-// 如果表格需要初始化请求参数，直接定义传给 ProTable(之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
+// 初始化请求参数
 const initParam = reactive({})
 
-// dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total 这些字段，那么你可以在这里进行处理成这些字段
+// 数据回调处理
 const dataCallback = (data: any) => {
   return {
     list: data.list,
@@ -43,26 +44,28 @@ const dataCallback = (data: any) => {
   }
 }
 
-// 如果你想在请求之前对当前请求参数做一些操作，可以自定义如下函数：params 为当前所有的请求参数（包括分页），最后返回请求列表接口
-// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getUserList"
+// 获取表格数据
 const getTableList = (params: any) => {
   let newParams = { ...params }
-  return getManagerPage(newParams)
+  console.log('请求参数:', newParams)
+  return getManagerPage(newParams).then((res) => {
+    console.log('API响应数据:', res)
+    return res
+  })
 }
 
-// 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
+// 页面按钮权限
 const { BUTTONS } = useAuthButtons()
 
 // 表格配置项
 const columns: ColumnProps<SysManager.ResManagerList>[] = [
   { type: 'selection', fixed: 'left', width: 60 },
   {
-    prop: 'avatar',
+    prop: 'avatarUrl',
     label: '头像',
     width: 120,
-    // 使用 render 自定义表格内容
     render: (scope) => {
-      return <el-avatar shape={'square'} size={27} src={scope.row.avatar} />
+      return <el-avatar shape={'square'} size={27} src={scope.row.avatarUrl} />
     }
   },
   {
@@ -71,23 +74,51 @@ const columns: ColumnProps<SysManager.ResManagerList>[] = [
     search: { el: 'input' }
   },
   {
-    prop: 'roleId',
-    tag: true,
+    prop: 'nickname',
+    label: '昵称',
+    search: { el: 'input' }
+  },
+  {
+    prop: 'phone',
+    label: '手机号',
+    search: { el: 'input' }
+  },
+  {
+    prop: 'role',
     label: '角色',
-    enum: getRoleList,
-    // search: { el: 'select', props: { filterable: true } },
-    fieldNames: { label: 'name', value: 'pkId' }
+    enum: [
+      { label: '超级管理员', value: 1 },
+      { label: '租户管理员', value: 2 },
+      { label: '普通用户', value: 3 }
+    ],
+    search: { el: 'select' },
+    fieldNames: { label: 'label', value: 'value' },
+    render: (scope) => {
+      const roleMap = { 1: '超级管理员', 2: '租户管理员', 3: '普通用户' }
+      return <el-tag type={scope.row.role === 1 ? 'danger' : scope.row.role === 2 ? 'warning' : 'info'}>{roleMap[scope.row.role]}</el-tag>
+    }
   },
   {
     prop: 'status',
     label: '状态',
+    enum: [
+      { label: '启用', value: 1 },
+      { label: '禁用', value: 0 }
+    ],
+    search: { el: 'select' },
+    fieldNames: { label: 'label', value: 'value' },
     render: (scope) => {
+      // 加强安全检查
+      if (!scope || !scope.row || scope.row.status === undefined) {
+        return <el-tag type="info">数据加载中...</el-tag>
+      }
+      const status = scope.row.status ?? 0
       return (
         <>
           {BUTTONS.value.status ? (
-            <el-switch model-value={scope.row.status} active-text={scope.row.status ? '启用' : '禁用'} active-value={1} inactive-value={0} />
+            <el-switch model-value={status} active-text={status ? '启用' : '禁用'} active-value={1} inactive-value={0} />
           ) : (
-            <el-tag type={scope.row.status ? 'success' : 'danger'}>{scope.row.status ? '启用' : '禁用'}</el-tag>
+            <el-tag type={status ? 'success' : 'danger'}>{status ? '启用' : '禁用'}</el-tag>
           )}
         </>
       )
@@ -101,13 +132,13 @@ const columns: ColumnProps<SysManager.ResManagerList>[] = [
   { prop: 'operation', label: '操作', fixed: 'right', width: 330 }
 ]
 
-// 删除用户信息
+// 删除管理员
 const deleteAccount = async (params: SysManager.ResManagerList) => {
-  await useHandleData(deleteManager, [params.pkId], `删除【${params.username}】用户`)
+  await useHandleData(deleteManager, [params.id], `删除【${params.username}】管理员`)
   proTable.value.getTableList()
 }
 
-// 打开 drawer(新增、查看、编辑)
+// 打开对话框
 const dialogRef = ref()
 const openDrawer = (title: string, row: Partial<SysManager.ResManagerList> = {}) => {
   let params = {
@@ -119,5 +150,18 @@ const openDrawer = (title: string, row: Partial<SysManager.ResManagerList> = {})
     maxHeight: title === '重置' ? '100px' : '500px'
   }
   dialogRef.value.acceptParams(params)
+}
+
+// 权限分配
+const roleAssignRef = ref()
+const openRoleAssign = (row: SysManager.ResManagerList) => {
+  roleAssignRef.value.openDialog(row)
+}
+
+// 刷新表格数据
+const refreshTable = () => {
+  if (proTable.value) {
+    proTable.value.getTableList()
+  }
 }
 </script>
