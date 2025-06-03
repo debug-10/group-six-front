@@ -1,8 +1,13 @@
-import type { RouteRecordRaw } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router'
+
 /**
  * staticRouter(静态路由)
  */
 export const staticRouter: RouteRecordRaw[] = [
+  {
+    path: '/',
+    redirect: '/home'
+  },
   {
     path: '/login',
     name: 'login',
@@ -14,9 +19,157 @@ export const staticRouter: RouteRecordRaw[] = [
   {
     path: '/layout',
     name: 'layout',
-    // component: () => import('@/layouts/index.vue'),
     component: () => import('@/layouts/indexAsync.vue'),
-    children: []
+    children: [
+      {
+        path: '/home',
+        name: 'home',
+        component: () => import('@/views/Home/Home.vue'),
+        meta: {
+          title: '首页',
+          icon: 'HomeFilled'
+        }
+      },
+      // 系统管理
+      {
+        path: '/system',
+        name: 'system',
+        meta: {
+          title: '系统管理',
+          icon: 'Setting'
+        },
+        children: [
+          {
+            path: '/system/manager',
+            name: 'systemManager',
+            component: () => import('@/views/System/Manager.vue'),
+            meta: {
+              title: '管理员管理',
+              icon: 'User'
+            }
+          },
+          {
+            path: '/system/role',
+            name: 'systemRole',
+            component: () => import('@/views/System/Role.vue'),
+            meta: {
+              title: '权限管理',
+              icon: 'Lock'
+            }
+          },
+          {
+            path: '/system/menu',
+            name: 'systemMenu',
+            component: () => import('@/views/System/Menu.vue'),
+            meta: {
+              title: '菜单管理',
+              icon: 'Menu'
+            }
+          }
+        ]
+      },
+      // 平台管理
+      {
+        path: '/platform',
+        name: 'platform',
+        meta: {
+          title: '平台管理',
+          icon: 'Monitor'
+        },
+        children: [
+          {
+            path: '/platform/version',
+            name: 'platformVersion',
+            component: () => import('@/views/Platform/Version.vue'),
+            meta: {
+              title: '版本管理',
+              icon: 'Promotion'
+            }
+          }
+        ]
+      },
+      // 租户管理
+      {
+        path: '/tenant',
+        name: 'tenant',
+        meta: {
+          title: '租户管理',
+          icon: 'OfficeBuilding'
+        },
+        children: [
+          {
+            path: '/tenant/school',
+            name: 'tenantSchool',
+            component: () => import('@/views/Tenant/School.vue'),
+            meta: {
+              title: '学校管理',
+              icon: 'School'
+            }
+          }
+          // ... 其他租户管理子路由
+        ]
+      },
+      // 设备管理
+      {
+        path: '/device',
+        name: 'device',
+        component: () => import('@/views/Device/index.vue'),
+        meta: {
+          title: '设备管理',
+          icon: 'Monitor'
+        }
+      },
+      // 统计管理
+      {
+        path: '/statistics',
+        name: 'statistics',
+        meta: {
+          title: '统计管理',
+          icon: 'DataAnalysis'
+        },
+        children: [
+          {
+            path: '/statistics/tenant',
+            name: 'statisticsTenant',
+            component: () => import('@/views/Statistics/Tenant.vue'),
+            meta: {
+              title: '租户统计',
+              icon: 'PieChart'
+            }
+          }
+          // ... 其他统计管理子路由
+        ]
+      },
+      // App管理
+      {
+        path: '/app',
+        name: 'app',
+        meta: {
+          title: 'App管理',
+          icon: 'Iphone'
+        },
+        children: [
+          {
+            path: '/app/user',
+            name: 'appUser',
+            component: () => import('@/views/User/index.vue'),
+            meta: {
+              title: '用户管理',
+              icon: 'User'
+            }
+          },
+          {
+            path: '/app/version',
+            name: 'appVersion',
+            component: () => import('@/views/App/Version.vue'),
+            meta: {
+              title: '版本管理',
+              icon: 'Promotion'
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
 
@@ -54,7 +207,6 @@ export const errorRouter = [
       noTagsView: true
     }
   },
-  // Resolve refresh page, route warnings
   {
     path: '/:pathMatch(.*)*',
     component: () => import('@/views/Error/404.vue')

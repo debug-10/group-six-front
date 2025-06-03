@@ -3,7 +3,6 @@ import { LOGIN_URL } from '@/configs/config'
 import { useAppStoreWithOut } from '@/store/modules/app'
 import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { initDynamicRouter } from '@/router/modules/dynamicRouter'
 import { useNProgress } from '@/hooks/useNProgress'
 import { staticRouter, errorRouter } from '@/router/modules/staticRouter'
 
@@ -23,8 +22,7 @@ const whiteList = ['/login', '/share-note'] // 不重定向白名单
  * @description 路由拦截 beforeEach
  * */
 router.beforeEach(async (to, from, next) => {
-  const usepermissionStore = useAppStoreWithOut()
-  const permissionStore = usePermissionStoreWithOut()
+  const appStore = useAppStoreWithOut()
   // 1.NProgress 开始
   start()
 
@@ -32,30 +30,27 @@ router.beforeEach(async (to, from, next) => {
   const title = import.meta.env.VITE_APP_TITLE
   document.title = to.meta.title ? `${to.meta.title} - ${title}` : title
 
-  // 有 Token 就在当前页面，没有 Token 重置路由到登陆页
-  if (!usepermissionStore.token) {
-    if (whiteList.indexOf(to.path) !== -1) {
-      next()
-      return
-    } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
-      return
-    }
-  }
-  // 3.判断是访问登陆页
-  if (to.path === LOGIN_URL) {
-    resetRouter()
-    next(from.fullPath)
-    return
-  } else {
-    permissionStore.setRouteName(to.name as string)
-    if (!permissionStore.getMenuList.length) {
-      await initDynamicRouter()
-      return next({ ...to, replace: true })
-    }
+  // 3.白名单直接放行
+  if (whiteList.indexOf(to.path) !== -1) {
     next()
     return
   }
+
+  // 4.没有token重定向到登录页
+  if (!appStore.token) {
+    next(`/login?redirect=${to.path}`)
+    return
+  }
+
+  // 5.访问登录页但已登录，重定向到首页
+  // 修改第47行
+  if (to.path === LOGIN_URL) {
+    next('/home')
+    return
+  }
+
+  // 6.正常访问
+  next()
 })
 
 export const resetRouter = (): void => {

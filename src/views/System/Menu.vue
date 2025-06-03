@@ -43,7 +43,6 @@ import { ColumnProps } from '@/components/ProTable/interface'
 import { useHandleData } from '@/hooks/useHandleData'
 import ProTable from '@/components/ProTable/index.vue'
 import MenuDialog from '@/views/System/components/MenuDialog.vue'
-import { CirclePlus, Delete, EditPen, View } from '@element-plus/icons-vue'
 import { getMenuList, addMenu, editMenu, removeMenu } from '@/api/modules/menu'
 
 // 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）

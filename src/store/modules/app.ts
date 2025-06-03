@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { pinia } from '../index'
 import { AppState, ThemeProps, AssemblySizeType, UserinfoType } from '../interface'
 import { DEFAULT_PRIMARY } from '@/configs/config'
-import { usePiniaPersist } from '@/hooks/usePiniaPersist'
+import { getManagerInfoApi } from '@/api/modules/manager'
 
 export const useAppStore = defineStore({
   id: 'AppState',
@@ -57,9 +57,25 @@ export const useAppStore = defineStore({
           [args[0]]: args[1]
         }
       })
+    },
+    // 获取用户信息
+    async getUserInfo() {
+      try {
+        const { data } = await getManagerInfoApi()
+        this.setUserinfo(data)
+        return data
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+        throw error
+      }
+    },
+    // 登出
+    logout() {
+      this.setToken('')
+      this.setUserinfo(null)
+      // 清除其他状态...
     }
-  },
-  persist: usePiniaPersist('AppState')
+  }
 })
 
 export const useAppStoreWithOut = () => {
