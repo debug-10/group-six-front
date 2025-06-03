@@ -277,14 +277,38 @@ export const usePermissionStore = defineStore({
           this.homePath = '/home'
       }
 
+      if (userInfo.role === 1) {
+        // 超级管理员拥有所有权限
+        this.buttonList = [
+          'sys:manager:add',
+          'sys:manager:edit',
+          'sys:manager:view',
+          'sys:manager:remove',
+          'sys:manager:reset-psw',
+          'sys:manager:assign-role',
+          'sys:role:add',
+          'sys:role:edit',
+          'sys:role:remove',
+          'sys:menu:add',
+          'sys:menu:edit',
+          'sys:menu:remove'
+        ]
+      } else if (userInfo.role === 2) {
+        // 租户管理员权限
+        this.buttonList = ['sys:manager:add', 'sys:manager:edit', 'sys:manager:view', 'sys:manager:remove', 'sys:manager:reset-psw']
+      } else {
+        // 普通用户权限
+        this.buttonList = ['sys:manager:view']
+      }
+
       // 如果用户有自定义权限，解析权限JSON
       if (userInfo.permissions) {
         try {
           const permissions = JSON.parse(userInfo.permissions)
-          this.buttonList = permissions.buttons || []
+          this.buttonList = permissions.buttons || this.buttonList
         } catch (error) {
           console.error('解析用户权限失败:', error)
-          this.buttonList = []
+          // 保持默认权限，不清空
         }
       }
     },
