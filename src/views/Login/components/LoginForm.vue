@@ -15,17 +15,17 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router' // 添加 useRoute
+import { useRouter, useRoute } from 'vue-router'
 import { Login } from '@/api/interface/index'
 import { ElNotification } from 'element-plus'
 import { loginApi } from '@/api/modules/login'
 import { useAppStoreWithOut } from '@/store/modules/app'
 import { getTimeState } from '@/utils/util'
 import type { ElForm } from 'element-plus'
-import { usePermissionStore } from '@/store/modules/permission' // 添加导入
+import { usePermissionStore } from '@/store/modules/permission'
 
 const { push } = useRouter()
-const route = useRoute() // 添加这行
+const route = useRoute()
 const appStore = useAppStoreWithOut()
 
 // 定义 formRef（校验规则）
@@ -39,7 +39,7 @@ const loginRules = reactive({
 const loading = ref(false)
 const loginForm = reactive<Login.ReqLoginForm>({ username: '', password: '' })
 
-const permissionStore = usePermissionStore() // 添加 store 实例
+const permissionStore = usePermissionStore()
 
 const login = (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -54,17 +54,25 @@ const login = (formEl: FormInstance | undefined) => {
       // 2.保存token
       appStore.setToken(data.access_token)
 
-      // 3.获取用户信息（可选，如果后端登录接口直接返回用户信息可以省略）
+      // 3.保存用户信息
       if (data.user) {
         appStore.setUserinfo(data.user)
       }
 
-      // 4.初始化权限和菜单
+      // 4.根据用户角色初始化权限和菜单
       permissionStore.setPermissionByRole()
 
-      // 5.跳转到首页
+      // 5.根据用户角色跳转到不同的首页
+      let redirectPath = '/home'
+      if (data.user?.role === 1) {
+        // 超管跳转到管理后台首页
+        redirectPath = '/home'
+      } else if (data.user?.role === 2) {
+        // 租户管理员跳转到物联平台首页
+        redirectPath = '/iot/dashboard'
+      }
       const redirect = route.query.redirect as string
-      push(redirect || '/home')
+      push(redirect || redirectPath)
 
       ElNotification({
         title: getTimeState(),
@@ -84,6 +92,12 @@ const login = (formEl: FormInstance | undefined) => {
       loading.value = false
     }
   })
+}
+
+// 重置表单
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
 }
 </script>
 
