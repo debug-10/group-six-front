@@ -14,6 +14,7 @@ export const iotRouter: RouteRecordRaw[] = [
       icon: 'Platform'
     },
     children: [
+      // 物联大屏
       {
         path: '/iot/dashboard',
         name: 'iotDashboard',
@@ -23,34 +24,15 @@ export const iotRouter: RouteRecordRaw[] = [
           icon: 'DataBoard'
         }
       },
-      // 管理员管理
+      // 账号管理
       {
-        path: '/iot/admin',
-        name: 'iotAdmin',
+        path: '/iot/admin/account',
+        name: 'iotAdminAccount',
+        component: () => import('@/views/IoT/Admin/AccountManage.vue'),
         meta: {
-          title: '管理员管理',
-          icon: 'UserFilled'
-        },
-        children: [
-          {
-            path: '/iot/admin/account',
-            name: 'iotAdminAccount',
-            component: () => import('@/views/IoT/Admin/AccountManage.vue'),
-            meta: {
-              title: '账号管理',
-              icon: 'User'
-            }
-          },
-          {
-            path: '/iot/admin/device-bind',
-            name: 'iotAdminDeviceBind',
-            component: () => import('@/views/IoT/Admin/DeviceBind.vue'),
-            meta: {
-              title: '设备绑定',
-              icon: 'Link'
-            }
-          }
-        ]
+          title: '账号管理',
+          icon: 'User'
+        }
       },
       // 设备管理
       {
@@ -184,13 +166,13 @@ export const iotRouter: RouteRecordRaw[] = [
           }
         ]
       },
-      // 资讯管理
+      // 公告管理
       {
         path: '/iot/news',
         name: 'iotNews',
         component: () => import('@/views/IoT/News/NewsManage.vue'),
         meta: {
-          title: '资讯管理',
+          title: '公告管理',
           icon: 'Document'
         }
       }
