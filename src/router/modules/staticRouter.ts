@@ -113,7 +113,7 @@ export const staticRouter: RouteRecordRaw[] = [
       {
         path: '/device',
         name: 'device',
-        component: () => import('@/views/Device/index.vue'),
+        component: () => import('@/views/Device/DeviceManage.vue'),
         meta: {
           title: '设备管理',
           icon: 'Monitor'
