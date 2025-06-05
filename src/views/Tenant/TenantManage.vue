@@ -69,7 +69,7 @@ const columns: ColumnProps[] = [
       return <el-tag type={scope.row.status === 1 ? 'success' : 'danger'}>{scope.row.status === 1 ? '启用' : '禁用'}</el-tag>
     }
   },
-  { prop: 'createTime', label: '创建时间', width: 180 },
+
   { prop: 'operation', label: '操作', fixed: 'right', width: 330 }
 ]
 
