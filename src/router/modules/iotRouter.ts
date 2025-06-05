@@ -35,10 +35,19 @@ export const iotRouter: RouteRecordRaw[] = [
         }
       },
       // 设备管理
+      // {
+      //   path: '/iot/device',
+      //   name: 'iotDevice',
+      //   component: () => import('@/views/IoT/Device/DeviceManage.vue'),
+      //   meta: {
+      //     title: '设备管理',
+      //     icon: 'Monitor'
+      //   }
+      // },
       {
-        path: '/iot/device',
-        name: 'iotDevice',
-        component: () => import('@/views/IoT/Device/DeviceManage.vue'),
+        path: '/device',
+        name: 'device',
+        component: () => import('@/views/Device/DeviceManage.vue'),
         meta: {
           title: '设备管理',
           icon: 'Monitor'
