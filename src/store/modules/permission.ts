@@ -243,14 +243,14 @@ const PLATFORM_CONFIGS = {
   IOT_MENUS: {
     homePath: '/iot/dashboard',
     menuList: [
-      // 账号管理
+      // 用户管理
       {
-        path: '/iot/admin/account',
+        path: '/iot/admin/accountmanage',
         name: 'iotAdminAccount',
         component: '/IoT/Admin/AccountManage',
         meta: {
-          title: '账号管理',
-          icon: 'UserFilled',
+          title: '用户管理',
+          icon: 'User',
           isHide: false,
           isAffix: false,
           isKeepAlive: true

@@ -24,13 +24,13 @@ export const iotRouter: RouteRecordRaw[] = [
           icon: 'DataBoard'
         }
       },
-      // 账号管理
+      // 用户管理
       {
-        path: '/iot/admin/account',
+        path: '/iot/admin/accountmanage',
         name: 'iotAdminAccount',
-        component: () => import('@/views/IoT/Admin/AccountManage.vue'),
+        component: () => import('/src/views/IoT/Admin/AccountManage.vue'),
         meta: {
-          title: '账号管理',
+          title: '用户管理',
           icon: 'User'
         }
       },
@@ -43,80 +43,6 @@ export const iotRouter: RouteRecordRaw[] = [
           title: '设备管理',
           icon: 'Monitor'
         }
-      },
-      // 设备对接
-      {
-        path: '/iot/device-connect',
-        name: 'iotDeviceConnect',
-        meta: {
-          title: '设备对接',
-          icon: 'Connection'
-        },
-        children: [
-          {
-            path: '/iot/device-connect/camera',
-            name: 'iotDeviceCamera',
-            component: () => import('@/views/IoT/DeviceConnect/Camera.vue'),
-            meta: {
-              title: '摄像头',
-              icon: 'VideoCamera'
-            }
-          },
-          {
-            path: '/iot/device-connect/access',
-            name: 'iotDeviceAccess',
-            component: () => import('@/views/IoT/DeviceConnect/Access.vue'),
-            meta: {
-              title: '门禁',
-              icon: 'Key'
-            }
-          },
-          {
-            path: '/iot/device-connect/air',
-            name: 'iotDeviceAir',
-            component: () => import('@/views/IoT/DeviceConnect/Air.vue'),
-            meta: {
-              title: '空调',
-              icon: 'Wind'
-            }
-          },
-          {
-            path: '/iot/device-connect/temperature',
-            name: 'iotDeviceTemperature',
-            component: () => import('@/views/IoT/DeviceConnect/Temperature.vue'),
-            meta: {
-              title: '温湿度',
-              icon: 'Thermometer'
-            }
-          },
-          {
-            path: '/iot/device-connect/smoke',
-            name: 'iotDeviceSmoke',
-            component: () => import('@/views/IoT/DeviceConnect/Smoke.vue'),
-            meta: {
-              title: '烟感',
-              icon: 'Warning'
-            }
-          },
-          {
-            path: '/iot/device-connect/light',
-            name: 'iotDeviceLight',
-            component: () => import('@/views/IoT/DeviceConnect/Light.vue'),
-            meta: {
-              title: '灯光',
-              icon: 'Sunny'
-            }
-          },
-          {
-            path: '/iot/device-connect/switch',
-            name: 'iotDeviceSwitch',
-            component: () => import('@/views/IoT/DeviceConnect/Switch.vue'),
-            meta: {
-              title: '开关',
-              icon: 'Switch'
-            }
-          }
-        ]
       },
       // 告警管理
       {
