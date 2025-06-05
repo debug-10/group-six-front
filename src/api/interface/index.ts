@@ -89,3 +89,63 @@ export namespace SysManager {
     newPassword: string
   }
 }
+
+// * 设备管理模块
+export namespace Device {
+  export interface DeviceCreateDTO {
+    deviceMac: string
+    name: string
+    type: number
+    tenantId: number
+    status: number
+    temperature: number
+    humidity: number
+    location: string
+  }
+
+  export interface DeviceUpdateDTO {
+    id: number
+    name: string
+    status: number
+    temperature: number
+    humidity: number
+    location: string
+  }
+
+  export interface DeviceStatusDTO {
+    id: number
+    status: number
+  }
+
+  export interface DeviceQuery extends ReqPage {
+    userId?: number
+    tenantId?: number
+    status?: number
+    type?: number
+  }
+
+  export interface DeviceVO {
+    id: number
+    deviceMac: string
+    name: string
+    type: number
+    status: number
+    temperature: number
+    humidity: number
+    tenantId: number
+    createTime: string
+    updateTime: string
+    location: string
+  }
+
+  export interface DevicePagination {
+    total: number
+    page: number
+    limit: number
+  }
+
+  export interface DeviceListResponse {
+    pagination: DevicePagination
+    devices: DeviceVO[]
+  }
+}

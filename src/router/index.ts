@@ -5,13 +5,14 @@ import { usePermissionStoreWithOut } from '@/store/modules/permission'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useNProgress } from '@/hooks/useNProgress'
 import { staticRouter, errorRouter } from '@/router/modules/staticRouter'
+import { iotRouter } from '@/router/modules/iotRouter'
 
 const { start, done } = useNProgress()
 
 // 路由对象
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [...staticRouter, ...errorRouter],
+  routes: [...staticRouter, ...iotRouter, ...errorRouter],
   strict: true,
   // 刷新时，滚动条位置还原
   scrollBehavior: () => ({ left: 0, top: 0 })
