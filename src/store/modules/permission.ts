@@ -243,44 +243,20 @@ const PLATFORM_CONFIGS = {
   IOT_MENUS: {
     homePath: '/iot/dashboard',
     menuList: [
+      // 用户管理
       {
-        path: '/iot-admin',
-        name: 'iotAdmin',
-        component: 'Layout',
+        path: '/iot/admin/accountmanage',
+        name: 'iotAdminAccount',
+        component: '/IoT/Admin/AccountManage',
         meta: {
-          title: '管理员',
-          icon: 'UserFilled',
+          title: '用户管理',
+          icon: 'User',
           isHide: false,
           isAffix: false,
           isKeepAlive: true
-        },
-        children: [
-          {
-            path: '/iot-admin/account',
-            name: 'account',
-            component: '/IoTAdmin/Account',
-            meta: {
-              title: '账号管理',
-              icon: 'UserFilled',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/iot-admin/device-bind',
-            name: 'deviceBind',
-            component: '/IoTAdmin/DeviceBind',
-            meta: {
-              title: '设备绑定',
-              icon: 'Connection',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          }
-        ]
+        }
       },
+      // 设备管理
       {
         path: '/iot-device',
         name: 'iotDevice',
@@ -293,116 +269,33 @@ const PLATFORM_CONFIGS = {
           isKeepAlive: true
         }
       },
+      // 告警管理
       {
-        path: '/device-connect',
-        name: 'deviceConnect',
-        component: 'Layout',
-        meta: {
-          title: '设备对接',
-          icon: 'Connection',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        },
-        children: [
-          {
-            path: '/device-connect/camera',
-            name: 'camera',
-            component: '/DeviceConnect/Camera',
-            meta: {
-              title: '摄像头',
-              icon: 'VideoCamera',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/access',
-            name: 'access',
-            component: '/DeviceConnect/Access',
-            meta: {
-              title: '门禁',
-              icon: 'Key',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/air',
-            name: 'air',
-            component: '/DeviceConnect/Air',
-            meta: {
-              title: '空调',
-              icon: 'Wind',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/sensor',
-            name: 'sensor',
-            component: '/DeviceConnect/Sensor',
-            meta: {
-              title: '温湿度',
-              icon: 'Thermometer',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/smoke',
-            name: 'smoke',
-            component: '/DeviceConnect/Smoke',
-            meta: {
-              title: '烟感',
-              icon: 'Warning',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/light',
-            name: 'light',
-            component: '/DeviceConnect/Light',
-            meta: {
-              title: '灯光',
-              icon: 'Sunny',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/device-connect/switch',
-            name: 'switch',
-            component: '/DeviceConnect/Switch',
-            meta: {
-              title: '开关',
-              icon: 'Switch',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          }
-        ]
-      },
-      {
-        path: '/iot-alarm',
+        path: '/iot/alarm',
         name: 'iotAlarm',
-        component: '/IoTAlarm/AlarmManage',
+        component: '/IoT/Alarm/AlarmManage',
         meta: {
-          title: '告警',
+          title: '告警管理',
           icon: 'Warning',
           isHide: false,
           isAffix: false,
           isKeepAlive: true
         }
       },
+      // 公告管理
+      {
+        path: '/iot/news', // 修改为与路由配置一致的路径
+        name: 'iotNews',
+        component: '/IoT/News/NewsManage', // 修改为正确的组件路径格式
+        meta: {
+          title: '公告管理',
+          icon: 'Document',
+          isHide: false,
+          isAffix: false,
+          isKeepAlive: true
+        }
+      },
+      // 统计管理
       {
         path: '/iot-statistics',
         name: 'iotStatistics',
@@ -452,18 +345,6 @@ const PLATFORM_CONFIGS = {
             }
           }
         ]
-      },
-      {
-        path: '/iot/news', // 修改为与路由配置一致的路径
-        name: 'iotNews',
-        component: '/IoT/News/NewsManage', // 修改为正确的组件路径格式
-        meta: {
-          title: '资讯管理',
-          icon: 'Document',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        }
       }
     ],
     buttonList: []
