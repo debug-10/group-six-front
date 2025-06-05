@@ -97,31 +97,31 @@ const PLATFORM_CONFIGS = {
               isAffix: false,
               isKeepAlive: true
             }
-          },
-          {
-            path: '/tenant/community',
-            name: 'community',
-            component: '/Tenant/Community',
-            meta: {
-              title: '小区管理',
-              icon: 'House',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/tenant/station',
-            name: 'station',
-            component: '/Tenant/Station',
-            meta: {
-              title: '驿站管理',
-              icon: 'Shop',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
           }
+          // {
+          //   path: '/tenant/community',
+          //   name: 'community',
+          //   component: '/Tenant/Community',
+          //   meta: {
+          //     title: '小区管理',
+          //     icon: 'House',
+          //     isHide: false,
+          //     isAffix: false,
+          //     isKeepAlive: true
+          //   }
+          // },
+          // {
+          //   path: '/tenant/station',
+          //   name: 'station',
+          //   component: '/Tenant/Station',
+          //   meta: {
+          //     title: '驿站管理',
+          //     icon: 'Shop',
+          //     isHide: false,
+          //     isAffix: false,
+          //     isKeepAlive: true
+          //   }
+          // }
         ]
       },
       {
@@ -454,9 +454,9 @@ const PLATFORM_CONFIGS = {
         ]
       },
       {
-        path: '/iot-news',
+        path: '/iot/news', // 修改为与路由配置一致的路径
         name: 'iotNews',
-        component: '/IoTNews/NewsManage',
+        component: '/IoT/News/NewsManage', // 修改为正确的组件路径格式
         meta: {
           title: '资讯管理',
           icon: 'Document',
