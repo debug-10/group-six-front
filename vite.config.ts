@@ -100,6 +100,10 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
           target: "http://127.0.0.1:8081",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/dev/, "")
+        },
+        "/share-admin-api":{
+          target: "http://127.0.0.1:8081",
+          changeOrigin: true,
         }
       }
     }

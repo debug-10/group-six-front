@@ -10,18 +10,18 @@
         :disabled="dialogProps.isView"
         :hide-required-asterisk="dialogProps.isView"
       >
-        <el-form-item label="设备名称" prop="name">
-          <el-input v-model="dialogProps.row.name" placeholder="请输入设备名称" maxlength="50" />
+        <el-form-item label="租户名称" prop="tenantName">
+          <el-input v-model="dialogProps.row.tenantName" placeholder="请输入租户名称" maxlength="50" />
         </el-form-item>
-        <el-form-item label="设备类型" prop="type">
-          <el-select v-model="dialogProps.row.type" placeholder="请选择设备类型" class="w-full">
-            <el-option label="类型1" :value="1" />
-            <el-option label="类型2" :value="2" />
-            <el-option label="类型3" :value="3" />
+        <el-form-item label="套餐类型" prop="packageType">
+          <el-select v-model="dialogProps.row.packageType" placeholder="请选择套餐类型" class="w-full">
+            <el-option label="基础套餐" :value="1" />
+            <el-option label="高级套餐" :value="2" />
+            <el-option label="企业套餐" :value="3" />
           </el-select>
         </el-form-item>
-        <el-form-item label="设备位置" prop="location">
-          <el-input v-model="dialogProps.row.location" placeholder="请输入设备位置" maxlength="100" />
+        <el-form-item label="管理员用户名" prop="adminUsername">
+          <el-input v-model="dialogProps.row.adminUsername" placeholder="请输入管理员用户名" maxlength="50" />
         </el-form-item>
         <el-form-item label="状态" prop="status" v-if="dialogProps.title !== '新增'">
           <el-radio-group v-model="dialogProps.row.status">
@@ -29,8 +29,8 @@
             <el-radio :label="0" border>禁用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="dialogProps.row.remark" type="textarea" placeholder="请输入备注信息" maxlength="200" :rows="3" />
+        <el-form-item label="创建者ID" prop="creatorId">
+          <el-input v-model.number="dialogProps.row.creatorId" placeholder="请输入创建者ID" maxlength="10" />
         </el-form-item>
       </el-form>
     </div>
@@ -61,21 +61,25 @@ const dialogVisible = ref(false)
 const dialogProps = ref<DialogProps>({
   isView: false,
   title: '',
-  row: { status: 1 },
+  row: { status: 1, packageType: 1 },
   labelWidth: 100,
   fullscreen: false,
   maxHeight: '500px'
 })
 
 const rules = reactive({
-  name: [
-    { required: true, message: '请输入设备名称', trigger: 'blur' },
+  tenantName: [
+    { required: true, message: '请输入租户名称', trigger: 'blur' },
     { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
   ],
-  type: [{ required: true, message: '请选择设备类型', trigger: 'change' }],
-  location: [
-    { required: true, message: '请输入设备位置', trigger: 'blur' },
-    { min: 2, max: 100, message: '长度在 2 到 100 个字符', trigger: 'blur' }
+  packageType: [{ required: true, message: '请选择套餐类型', trigger: 'change' }],
+  adminUsername: [
+    { required: true, message: '请输入管理员用户名', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
+  creatorId: [
+    { required: true, message: '请输入创建者ID', trigger: 'blur' },
+    { type: 'number', message: '创建者ID必须为数字', trigger: 'blur' }
   ]
 })
 
@@ -100,7 +104,7 @@ const cancelDialog = (clean = false) => {
   dialogVisible.value = false
   if (clean) {
     ruleFormRef.value?.resetFields()
-    dialogProps.value.row = { status: 1 }
+    dialogProps.value.row = { status: 1, packageType: 1 }
   }
 }
 

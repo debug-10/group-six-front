@@ -100,7 +100,7 @@ export const staticRouter: RouteRecordRaw[] = [
           {
             path: '/tenant/school',
             name: 'tenantSchool',
-            component: () => import('@/views/Tenant/School.vue'),
+            component: () => import('@/views/Tenant/TenantManage.vue'),
             meta: {
               title: '学校管理',
               icon: 'School'
