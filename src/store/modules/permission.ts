@@ -89,7 +89,7 @@ const PLATFORM_CONFIGS = {
           {
             path: '/tenant/school',
             name: 'school',
-            component: '/Tenant/School',
+            component: '/Tenant/TenantManage',
             meta: {
               title: '学校管理',
               icon: 'School',
@@ -125,8 +125,8 @@ const PLATFORM_CONFIGS = {
         ]
       },
       {
-        path: '/tenant',
-        name: 'tenant',
+        path: '/device',
+        name: 'device',
         component: 'Layout',
         meta: {
           title: '设备管理',
@@ -282,12 +282,12 @@ const PLATFORM_CONFIGS = {
         ]
       },
       {
-        path: '/iot-device',
-        name: 'iotDevice',
-        component: '/IoTDevice/DeviceManage',
+        path: '/iot/device',
+        name: 'device',
+        component: '/IoT/Device/DeviceManage',
         meta: {
           title: '设备管理',
-          icon: 'Monitor',
+          icon: 'Document',
           isHide: false,
           isAffix: false,
           isKeepAlive: true

@@ -149,3 +149,54 @@ export namespace Device {
     devices: DeviceVO[]
   }
 }
+
+// * 租户管理模块
+export namespace Tenant {
+  export interface TenantCreateDTO {
+    tenantName: string
+    packageType: number
+    adminUsername: string
+    status: number
+    creatorId: number
+  }
+
+  export interface TenantUpdateDTO {
+    tenantId: number
+    tenantName: string
+    packageType: number
+    adminUsername: string
+    status: number
+  }
+
+  export interface TenantStatusDTO {
+    tenantId: number
+    status: number
+  }
+
+  export interface TenantQuery extends ReqPage {
+    creatorId?: number
+    status?: number
+    packageType?: number
+  }
+
+  export interface TenantVO {
+    tenantId: number
+    tenantName: string
+    packageType: number
+    status: number
+    creatorId: number
+    createTime: string
+    updateTime: string
+  }
+
+  export interface TenantPagination {
+    total: number
+    page: number
+    limit: number
+  }
+
+  export interface TenantListResponse {
+    pagination: TenantPagination
+    tenants: TenantVO[]
+  }
+}
