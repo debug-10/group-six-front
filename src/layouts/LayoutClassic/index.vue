@@ -5,7 +5,7 @@
       <div class="header-lf">
         <div class="logo flx-center">
           <img class="logo-img" src="@/assets/images/2.jpg" alt="logo" />
-          <span class="logo-text">资源管理系统</span>
+          <span class="logo-text">设备管理系统</span>
         </div>
         <ToolBarLeft />
       </div>

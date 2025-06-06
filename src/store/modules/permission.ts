@@ -256,19 +256,31 @@ const PLATFORM_CONFIGS = {
           isKeepAlive: true
         }
       },
-      // 设备管理
       {
-        path: '/iot/device',
+        path: '/device',
         name: 'device',
-        component: '/IoT/Device/DeviceManage',
+        component: 'Layout',
         meta: {
           title: '设备管理',
-          icon: 'Document',
+          icon: 'OfficeBuilding',
           isHide: false,
           isAffix: false,
           isKeepAlive: true
         }
       },
+      // 设备管理
+      // {
+      //   path: '/iot/device',
+      //   name: 'device',
+      //   component: '/IoT/Device/DeviceManage',
+      //   meta: {
+      //     title: '设备管理',
+      //     icon: 'Document',
+      //     isHide: false,
+      //     isAffix: false,
+      //     isKeepAlive: true
+      //   }
+      // },
       // 告警管理
       {
         path: '/iot/alarm',
