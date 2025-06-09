@@ -75,7 +75,7 @@ export const iotRouter: RouteRecordRaw[] = [
           {
             path: '/iot/statistics/device',
             name: 'iotStatisticsDevice',
-            component: () => import('@/views/IoT/Statistics/DeviceStatistics.vue'),
+            component: () => import('@/views/IoT/Statistics/Device.vue'),
             meta: {
               title: '设备统计',
               icon: 'Monitor'

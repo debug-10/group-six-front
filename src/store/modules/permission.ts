@@ -321,7 +321,7 @@ const PLATFORM_CONFIGS = {
         },
         children: [
           {
-            path: '/iot-statistics/device',
+            path: '/iot/statistics/device',
             name: 'iotDeviceStats',
             component: '/IoTStatistics/DeviceStats',
             meta: {

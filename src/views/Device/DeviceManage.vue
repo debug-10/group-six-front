@@ -55,9 +55,10 @@ const columns: ColumnProps[] = [
     prop: 'type',
     label: '设备类型',
     enum: [
-      { label: '类型1', value: 1 },
-      { label: '类型2', value: 2 },
-      { label: '类型3', value: 3 }
+      { label: '智能夜灯', value: 1 },
+      { label: '智能火警', value: 2 },
+      { label: '智能风扇', value: 3 },
+      { label: '智能空调', value: 4 }
     ],
     search: { el: 'select', props: { filterable: true } }
   },

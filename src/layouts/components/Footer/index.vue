@@ -1,6 +1,6 @@
 <template>
   <div class="footer flx-center">
-    <a href="#" target="_blank"> 2024 © </a>
+    <a href="#" target="_blank"> 2025 © </a>
   </div>
 </template>
 

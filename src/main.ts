@@ -27,6 +27,11 @@ import { setupPermission } from '@/directives'
 import { createApp } from 'vue'
 import App from './App.vue'
 
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+
+
+
 const setupAll = async () => {
   const app = createApp(App)
 
@@ -41,6 +46,8 @@ const setupAll = async () => {
   setupRouter(app)
 
   setupPermission(app)
+
+  app.use(ElementPlus)
 
   app.mount('#app')
 }

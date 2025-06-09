@@ -235,6 +235,12 @@ module.exports = {
           {
             ignorePseudoElements: ['v-deep', 'v-global', 'v-slotted']
           }
+        ],
+        'at-rule-no-unknown': [
+          true,
+          {
+            ignoreAtRules: ['tailwind']
+          }
         ]
       }
     }

@@ -34,7 +34,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       EslintPlugin({
         cache: false,
         // 检查的文件
-        include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx']
+        include: ['src/**/*.vue', 'src/**/*.ts', 'src/**/*.tsx','leaflet']
       }),
       VueI18nPlugin({
         runtimeOnly: true,
