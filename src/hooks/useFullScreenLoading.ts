@@ -1,8 +1,11 @@
 import { ElLoading } from 'element-plus'
 
-export const useFullScreenLoading = () => {
+export const useFullScreenLoading = (excludeLoading = false) => {
   /* 全局请求 loading(服务方式调用) */
   let loadingInstance: ReturnType<typeof ElLoading.service>
+
+  // 是否禁用加载动画
+  if (excludeLoading) return { showFullScreenLoading: () => {}, hideFullScreenLoading: () => {} }
 
   const startLoading = () => {
     loadingInstance = ElLoading.service({
@@ -12,6 +15,7 @@ export const useFullScreenLoading = () => {
       background: 'rgba(0, 0, 0, 0.7)'
     })
   }
+
   const endLoading = () => {
     loadingInstance.close()
   }

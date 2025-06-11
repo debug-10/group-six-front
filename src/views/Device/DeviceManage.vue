@@ -68,6 +68,11 @@ const columns: ColumnProps[] = [
     search: { el: 'input' }
   },
   {
+    prop: 'deviceMac',
+    label: '设备 MAC 地址',
+    search: { el: 'input' }
+  },
+  {
     prop: 'status',
     label: '状态',
     enum: [

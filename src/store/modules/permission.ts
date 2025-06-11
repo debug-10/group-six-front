@@ -97,6 +97,18 @@ const PLATFORM_CONFIGS = {
               isAffix: false,
               isKeepAlive: true
             }
+          },
+          {
+            path: '/tenant/package',
+            name: 'package',
+            component: '/Package/PackageManage',
+            meta: {
+              title: '套餐管理',
+              icon: 'Wallet',
+              isHide: false,
+              isAffix: false,
+              isKeepAlive: true
+            }
           }
           // {
           //   path: '/tenant/community',
@@ -197,45 +209,45 @@ const PLATFORM_CONFIGS = {
             }
           }
         ]
-      },
-      {
-        path: '/app',
-        name: 'app',
-        component: 'Layout',
-        meta: {
-          title: 'App管理',
-          icon: 'Iphone',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        },
-        children: [
-          {
-            path: '/app/user',
-            name: 'appUser',
-            component: '/User/UserManage',
-            meta: {
-              title: '用户管理',
-              icon: 'User',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/app/version',
-            name: 'appVersion',
-            component: '/App/Version',
-            meta: {
-              title: '版本管理',
-              icon: 'Document',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          }
-        ]
       }
+      // {
+      //   path: '/app',
+      //   name: 'app',
+      //   component: 'Layout',
+      //   meta: {
+      //     title: 'App管理',
+      //     icon: 'Iphone',
+      //     isHide: false,
+      //     isAffix: false,
+      //     isKeepAlive: true
+      //   },
+      //   children: [
+      //     {
+      //       path: '/app/user',
+      //       name: 'appUser',
+      //       component: '/User/UserManage',
+      //       meta: {
+      //         title: '用户管理',
+      //         icon: 'User',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     },
+      //     {
+      //       path: '/app/version',
+      //       name: 'appVersion',
+      //       component: '/App/Version',
+      //       meta: {
+      //         title: '版本管理',
+      //         icon: 'Document',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     }
+      //   ]
+      // }
     ],
     buttonList: ['sys:manager:add', 'sys:manager:view', 'sys:manager:edit', 'sys:manager:assign-role', 'sys:manager:reset-psw', 'sys:manager:remove']
   },
@@ -256,31 +268,32 @@ const PLATFORM_CONFIGS = {
           isKeepAlive: true
         }
       },
-      {
-        path: '/device',
-        name: 'device',
-        component: 'Layout',
-        meta: {
-          title: '设备管理',
-          icon: 'OfficeBuilding',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        }
-      },
-      // 设备管理
+      // },
       // {
-      //   path: '/iot/device',
+      //   path: '/device',
       //   name: 'device',
-      //   component: '/IoT/Device/DeviceManage',
+      //   component: 'Layout',
       //   meta: {
       //     title: '设备管理',
-      //     icon: 'Document',
+      //     icon: 'OfficeBuilding',
       //     isHide: false,
       //     isAffix: false,
       //     isKeepAlive: true
       //   }
       // },
+      // 设备管理
+      {
+        path: '/iot/device',
+        name: 'device',
+        component: '/IoT/Device/DeviceManage',
+        meta: {
+          title: '设备管理',
+          icon: 'Document',
+          isHide: false,
+          isAffix: false,
+          isKeepAlive: true
+        }
+      },
       // 告警管理
       {
         path: '/iot/alarm',

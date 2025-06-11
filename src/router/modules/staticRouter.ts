@@ -105,6 +105,15 @@ export const staticRouter: RouteRecordRaw[] = [
               title: '学校管理',
               icon: 'School'
             }
+          },
+          {
+            path: '/tenant/package',
+            name: 'tenantPackage',
+            component: () => import('@/views/Tenant/PackageManage.vue'),
+            meta: {
+              title: '套餐管理',
+              icon: 'Wallet'
+            }
           }
           // ... 其他租户管理子路由
         ]
@@ -139,36 +148,36 @@ export const staticRouter: RouteRecordRaw[] = [
           }
           // ... 其他统计管理子路由
         ]
-      },
-      // App管理
-      {
-        path: '/app',
-        name: 'app',
-        meta: {
-          title: 'App管理',
-          icon: 'Iphone'
-        },
-        children: [
-          {
-            path: '/app/user',
-            name: 'appUser',
-            component: () => import('@/views/User/index.vue'),
-            meta: {
-              title: '用户管理',
-              icon: 'User'
-            }
-          },
-          {
-            path: '/app/version',
-            name: 'appVersion',
-            component: () => import('@/views/App/Version.vue'),
-            meta: {
-              title: '版本管理',
-              icon: 'Promotion'
-            }
-          }
-        ]
       }
+      // App管理
+      // {
+      //   path: '/app',
+      //   name: 'app',
+      //   meta: {
+      //     title: 'App管理',
+      //     icon: 'Iphone'
+      //   },
+      //   children: [
+      //     {
+      //       path: '/app/user',
+      //       name: 'appUser',
+      //       component: () => import('@/views/User/index.vue'),
+      //       meta: {
+      //         title: '用户管理',
+      //         icon: 'User'
+      //       }
+      //     },
+      //     {
+      //       path: '/app/version',
+      //       name: 'appVersion',
+      //       component: () => import('@/views/App/Version.vue'),
+      //       meta: {
+      //         title: '版本管理',
+      //         icon: 'Promotion'
+      //       }
+      //     }
+      //   ]
+      // }
     ]
   }
 ]

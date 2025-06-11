@@ -1,179 +1,128 @@
 <template>
-  <div class="device-manage">
-    <div class="table-box">
-      <ProTable ref="proTable" title="设备管理" :columns="columns" :request-api="getDeviceList" :init-param="initParam" :data-callback="dataCallback">
-        <!-- 表格 header 按钮 -->
-        <template #tableHeader="scope">
-          <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增设备</el-button>
-          <el-button type="success" :icon="Refresh" @click="refreshDeviceStatus">刷新状态</el-button>
-        </template>
-        <!-- 设备状态 -->
-        <template #status="scope">
-          <el-tag :type="scope.row.status === 'online' ? 'success' : 'danger'">
-            {{ scope.row.status === 'online' ? '在线' : '离线' }}
-          </el-tag>
-        </template>
-        <!-- 表格操作 -->
-        <template #operation="scope">
-          <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
-          <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-          <el-button type="warning" link :icon="Setting" @click="controlDevice(scope.row)">控制</el-button>
-          <el-button type="danger" link :icon="Delete" @click="deleteDevice(scope.row)">删除</el-button>
-        </template>
-      </ProTable>
-      <DeviceDialog ref="dialogRef" />
-      <DeviceControlDialog ref="controlDialogRef" />
-    </div>
+  <div class="table-box">
+    <ProTable ref="proTable" title="设备列表" :columns="columns" :request-api="getTableList" :init-param="initParam" :data-callback="dataCallback">
+      <template #tableHeader>
+        <div></div>
+        <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增设备</el-button>
+        <el-button type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
+      </template>
+      <template #operation="{ row }">
+        <div></div>
+        <el-button type="primary" link :icon="View" @click="openDrawer('查看', row)">查看</el-button>
+        <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', row)">编辑</el-button>
+        <el-button type="primary" link :icon="Setting" @click="updateDeviceStatus(row)">
+          {{ row.status === 1 ? '禁用' : '启用' }}
+        </el-button>
+        <el-button type="danger" link :icon="Delete" @click="deleteDevice(row)">删除</el-button>
+      </template>
+    </ProTable>
+    <DeviceDialog ref="dialogRef" />
   </div>
 </template>
 
-<script setup lang="ts" name="DeviceManage">
+<script setup lang="tsx" name="DeviceManage">
 import { ref, reactive } from 'vue'
-import { ColumnProps, ProTableInstance } from '@/components/ProTable/interface'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { ColumnProps } from '@/components/ProTable/interface'
+import { CirclePlus, Download, View, EditPen, Setting, Delete } from '@element-plus/icons-vue'
 import ProTable from '@/components/ProTable/index.vue'
 import DeviceDialog from './components/DeviceDialog.vue'
-import DeviceControlDialog from './components/DeviceControlDialog.vue'
 import { useHandleData } from '@/hooks/useHandleData'
+import { useDownload } from '@/hooks/useDownload'
+import { getDevicePageApi, createDeviceApi, updateDeviceApi, deleteDeviceApi, updateDeviceStatusApi, exportDeviceApi } from '@/api/modules/device'
+import { Device } from '@/api/interface'
 
-// ProTable 实例
-const proTable = ref<ProTableInstance>()
+// 表格实例
+const proTable = ref()
+const dialogRef = ref()
 
-// 初始化请求参数
 const initParam = reactive({})
+const dataCallback = (data: any) => ({
+  list: data.list || [],
+  total: data.total || 0
+})
+const getTableList = (params: any) => getDevicePageApi({ ...params })
 
-// 数据回调处理
-const dataCallback = (data: any) => {
-  return {
-    list: data.list,
-    total: data.total,
-    pageNum: data.pageNum,
-    pageSize: data.pageSize
-  }
-}
-
-// 获取表格列表
-const getTableList = () => {
-  proTable.value?.getTableList()
-}
-
-// 表格配置项
-const columns = reactive<ColumnProps[]>([
-  { type: 'selection', fixed: 'left', width: 70 },
-  { type: 'index', label: '#', width: 80 },
+const columns: ColumnProps[] = [
+  { type: 'selection', fixed: 'left', width: 60 },
+  { type: 'index', label: '序号', width: 60 },
   {
-    prop: 'deviceName',
+    prop: 'name',
     label: '设备名称',
     search: { el: 'input' }
   },
   {
-    prop: 'deviceId',
-    label: '设备ID',
-    search: { el: 'input' }
-  },
-  {
-    prop: 'deviceType',
+    prop: 'type',
     label: '设备类型',
     enum: [
-      { label: '摄像头', value: 'camera' },
-      { label: '门禁', value: 'access' },
-      { label: '空调', value: 'air' },
-      { label: '温湿度', value: 'temp' },
-      { label: '烟感', value: 'smoke' },
-      { label: '灯光', value: 'light' },
-      { label: '开关', value: 'switch' }
+      { label: '智能夜灯', value: 1 },
+      { label: '智能火警', value: 2 },
+      { label: '智能风扇', value: 3 },
+      { label: '智能空调', value: 4 }
     ],
     search: { el: 'select', props: { filterable: true } }
   },
   {
     prop: 'location',
-    label: '设备位置'
+    label: '设备位置',
+    search: { el: 'input' }
+  },
+  {
+    prop: 'deviceMac',
+    label: '设备 MAC 地址',
+    search: { el: 'input' }
   },
   {
     prop: 'status',
-    label: '在线状态',
+    label: '状态',
     enum: [
-      { label: '在线', value: 'online', tagType: 'success' },
-      { label: '离线', value: 'offline', tagType: 'danger' }
+      { label: '启用', value: 1 },
+      { label: '禁用', value: 0 }
     ],
-    search: { el: 'select', props: { filterable: true } }
+    search: { el: 'select' },
+    render: (scope) => {
+      return <el-tag type={scope.row.status === 1 ? 'success' : 'danger'}>{scope.row.status === 1 ? '启用' : '禁用'}</el-tag>
+    }
   },
-  {
-    prop: 'temperature',
-    label: '温度(°C)'
-  },
-  {
-    prop: 'humidity',
-    label: '湿度(%)'
-  },
-  {
-    prop: 'lastOnlineTime',
-    label: '最后在线时间',
-    width: 180
-  },
-  { prop: 'operation', label: '操作', fixed: 'right', width: 280 }
-])
+  { prop: 'createTime', label: '创建时间', width: 180 },
+  { prop: 'operation', label: '操作', fixed: 'right', width: 330 }
+]
 
-// 删除设备
-const deleteDevice = async (params: any) => {
-  await useHandleData(() => deleteDeviceApi(params.id), `删除设备【${params.deviceName}】`)
-  getTableList()
+const deleteDevice = async (row: Device.DeviceVO) => {
+  await useHandleData(deleteDeviceApi, [row.id], `删除设备【${row.name}】`)
+  proTable.value?.getTableList()
 }
 
-// 刷新设备状态
-const refreshDeviceStatus = async () => {
-  await useHandleData(() => refreshDeviceStatusApi(), '刷新设备状态')
-  getTableList()
+const updateDeviceStatus = async (row: Device.DeviceVO) => {
+  const newStatus = row.status === 1 ? 0 : 1
+  ElMessageBox.confirm(`确认要${newStatus === 1 ? '启用' : '禁用'}设备【${row.name}】吗？`, '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    await updateDeviceStatusApi({ id: row.id, status: newStatus })
+    ElMessage.success('操作成功')
+    proTable.value?.getTableList()
+  })
 }
 
-// 控制设备
-const controlDialogRef = ref<InstanceType<typeof DeviceControlDialog>>()
-const controlDevice = (row: any) => {
-  const params = {
-    title: '设备控制',
-    row: { ...row },
-    getTableList
-  }
-  controlDialogRef.value?.acceptParams(params)
+const downloadFile = () => {
+  useDownload(exportDeviceApi, '设备列表', proTable.value?.searchParam)
 }
 
-// 打开设备对话框
-const dialogRef = ref<InstanceType<typeof DeviceDialog>>()
-const openDrawer = (title: string, row: Partial<any> = {}) => {
-  const params = {
+const openDrawer = (title: string, row: Partial<Device.DeviceVO> = {}) => {
+  dialogRef.value.acceptParams({
     title,
     isView: title === '查看',
     row: { ...row },
-    api: title === '新增' ? addDeviceApi : title === '编辑' ? editDeviceApi : undefined,
-    getTableList
-  }
-  dialogRef.value?.acceptParams(params)
-}
-
-// 模拟API函数
-const getDeviceList = async (params: any) => {
-  return {
-    data: {
-      list: [],
-      total: 0,
-      pageNum: 1,
-      pageSize: 10
-    }
-  }
-}
-
-const deleteDeviceApi = async (id: string) => {
-  // 删除设备API
-}
-
-const refreshDeviceStatusApi = async () => {
-  // 刷新设备状态API
-}
-
-const addDeviceApi = async (params: any) => {
-  // 新增设备API
-}
-
-const editDeviceApi = async (params: any) => {
-  // 编辑设备API
+    api: title === '新增' ? createDeviceApi : title === '编辑' ? updateDeviceApi : undefined,
+    getTableList: proTable.value?.getTableList
+  })
 }
 </script>
+
+<style scoped lang="less">
+.table-box {
+  margin: 20px;
+}
+</style>
