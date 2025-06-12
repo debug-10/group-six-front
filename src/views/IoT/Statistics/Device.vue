@@ -44,7 +44,7 @@
             <div class="stat-value text-white text-3xl font-bold">{{ summary.alarmToday || 0 }}</div>
             <div class="stat-change flex items-center mt-2 text-red-400">
               <i class="fa fa-arrow-down mr-1"></i>
-              <span> </span>
+              <span></span>
             </div>
           </div>
         </div>
@@ -58,12 +58,12 @@
               <i class="fa fa-bar-chart mr-2 text-blue-400"></i>
               南京各区设备统计
             </div>
-            <div class="text-sm text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"> <i class="fa fa-refresh mr-1"></i>刷新 </div>
           </div>
           <div ref="deviceDistrictChart" class="chart-container h-[320px]" />
         </div>
       </el-col>
 
+      <!-- 设备点位地图 -->
       <el-col :span="12" :class="{ 'fixed top-0 left-0 right-0 bottom-0 z-50': isMapFullScreen }">
         <div
           class="screen-panel bg-gray-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-700/30 transform transition-all hover:scale-[1.01] hover:shadow-xl"
@@ -91,7 +91,6 @@
               <i class="fa fa-exclamation-triangle mr-2 text-yellow-400"></i>
               告警等级分布
             </div>
-            <div class="text-sm text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"> <i class="fa fa-filter mr-1"></i>筛选 </div>
           </div>
           <div ref="alarmLevelChart" class="chart-container h-[320px]" />
         </div>
@@ -105,11 +104,6 @@
               <i class="fa fa-line-chart mr-2 text-purple-400"></i>
               告警趋势
             </div>
-            <div class="flex space-x-2">
-              <button class="text-xs bg-blue-700/50 hover:bg-blue-700/70 text-white px-2 py-1 rounded transition-colors">日</button>
-              <button class="text-xs bg-gray-700/50 hover:bg-gray-700/70 text-white px-2 py-1 rounded transition-colors">周</button>
-              <button class="text-xs bg-gray-700/50 hover:bg-gray-700/70 text-white px-2 py-1 rounded transition-colors">月</button>
-            </div>
           </div>
           <div ref="alarmTrendChart" class="chart-container h-[320px]" />
         </div>
@@ -119,6 +113,9 @@
 </template>
 
 <script lang="ts" setup>
+// 注意：此脚本使用 ES 模块语法，需要通过 Vite 或 Webpack 等构建工具处理 .vue 文件
+// 请确保项目配置了 TypeScript 和 Vue 支持，并安装了必要依赖（如 vue、echarts、element-plus）
+
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
 import 'echarts/theme/dark'
@@ -126,10 +123,10 @@ import nanjing from '@/assets/map/nanjing.json'
 import { getDeviceDistrictStats, getDeviceMap, getAlarmLevelStats, getAlarmTrend } from '@/api/modules/dashboard/index'
 import { Dashboard } from '@/api/modules/dashboard/index'
 
-// 注册地图
+// 注册南京地图
 echarts.registerMap('nanjing', nanjing as any)
 
-// 图表引用
+// 图表 DOM 引用
 const deviceDistrictChart = ref<HTMLElement | null>(null)
 const deviceMapChart = ref<HTMLElement | null>(null)
 const alarmLevelChart = ref<HTMLElement | null>(null)
@@ -146,22 +143,22 @@ const summary = ref({})
 // 时间和动画状态
 const nowTime = ref(new Date().toLocaleString())
 const pulseTime = ref(false)
-
 const isMapFullScreen = ref(false)
-// 定时更新时间和触发脉冲动画
+
+// 每秒更新时间并触发脉冲动画
 setInterval(() => {
-  nowTime.value = new Date().toLocaleString() // 每秒更新时间
+  nowTime.value = new Date().toLocaleString()
   pulseTime.value = true
   setTimeout(() => (pulseTime.value = false), 500)
 }, 1000)
 
-// 初始化图表
+// 初始化所有图表
 const initCharts = () => {
-  // 清空现有图表
+  // 清理现有图表
   charts.value.forEach((chart) => chart.dispose())
   charts.value = []
 
-  // 设备区域统计图
+  // 设备区域统计图（柱状图）
   if (deviceDistrictChart.value && districtData.value.length) {
     const chart = echarts.init(deviceDistrictChart.value, 'dark')
     chart.setOption({
@@ -171,12 +168,10 @@ const initCharts = () => {
         borderColor: 'rgba(76, 175, 80, 0.3)',
         borderWidth: 1,
         textStyle: { color: '#fff' },
-        formatter: (params: any) => {
-          return `
-            <div style="color: #4CAF50; font-weight: bold;">${params[0].name}</div>
-            <div>设备数量: <span style="color: #2196F3;">${params[0].value}</span></div>
-          `
-        }
+        formatter: (params: any) => `
+          <div style="color: #4CAF50; font-weight: bold;">${params[0].name}</div>
+          <div>设备数量: <span style="color: #2196F3;">${params[0].value}</span></div>
+        `
       },
       grid: {
         left: '3%',
@@ -192,9 +187,7 @@ const initCharts = () => {
           interval: 0,
           rotate: 45
         },
-        axisLine: {
-          lineStyle: { color: 'rgba(255, 255, 255, 0.2)' }
-        },
+        axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.2)' } },
         axisTick: { show: false }
       },
       yAxis: {
@@ -229,7 +222,7 @@ const initCharts = () => {
     charts.value.push(chart)
   }
 
-  // 设备地图
+  // 设备点位地图（散点图）
   if (
     deviceMapChart.value &&
     mapData.value.length &&
@@ -243,7 +236,7 @@ const initCharts = () => {
         borderColor: 'rgba(76, 175, 80, 0.3)',
         borderWidth: 1,
         textStyle: { color: '#fff' },
-        formatter: () => `${params.name}<br/>经度: ${params.value[0]}<br/>纬度: ${params.value[1]}`
+        formatter: (params: any) => `${params.name}<br/>经度: ${params.value[0]}<br/>纬度: ${params.value[1]}`
       },
       geo: {
         map: 'nanjing',
@@ -262,7 +255,7 @@ const initCharts = () => {
         emphasis: {
           itemStyle: { areaColor: 'rgba(43, 145, 183, 0.5)' }
         },
-        layoutSize: '100%' // 确保地图适配容器尺寸
+        layoutSize: '100%'
       },
       series: [
         {
@@ -272,7 +265,7 @@ const initCharts = () => {
           data: mapData.value,
           symbolSize: 12,
           itemStyle: {
-            color: () => '#67C23A',
+            color: '#67C23A',
             shadowBlur: 20,
             shadowColor: 'rgba(103, 194, 58, 0.5)'
           },
@@ -288,10 +281,10 @@ const initCharts = () => {
       ]
     })
     charts.value.push(chart)
-    setTimeout(() => chart.resize(), 100) // 初始渲染后调整尺寸
+    setTimeout(() => chart.resize(), 100)
   }
 
-  // 告警等级分布
+  // 告警等级分布（饼图）
   if (alarmLevelChart.value && levelData.value.length) {
     const chart = echarts.init(alarmLevelChart.value, 'dark')
     chart.setOption({
@@ -301,13 +294,11 @@ const initCharts = () => {
         borderColor: 'rgba(76, 175, 80, 0.3)',
         borderWidth: 1,
         textStyle: { color: '#fff' },
-        formatter: (params: any) => {
-          return `
-            <div style="color: #FFC107; font-weight: bold;">${params.name}</div>
-            <div>告警数量: <span style="color: #FF5722;">${params.value}</span></div>
-            <div>占比: <span style="color: #FF5722;">${params.percent}%</span></div>
-          `
-        }
+        formatter: (params: any) => `
+          <div style="color: #FFC107; font-weight: bold;">${params.name}</div>
+          <div>告警数量: <span style="color: #FF5722;">${params.value}</span></div>
+          <div>占比: <span style="color: #FF5722;">${params.percent}%</span></div>
+        `
       },
       legend: {
         bottom: 10,
@@ -357,7 +348,7 @@ const initCharts = () => {
     charts.value.push(chart)
   }
 
-  // 告警趋势
+  // 告警趋势（折线图）
   if (alarmTrendChart.value && trendData.value.length) {
     const chart = echarts.init(alarmTrendChart.value, 'dark')
     chart.setOption({
@@ -367,12 +358,9 @@ const initCharts = () => {
         borderColor: 'rgba(76, 175, 80, 0.3)',
         borderWidth: 1,
         textStyle: { color: '#fff' },
-        formatter: (params: any) => {
-          return `
-            <div style="color: #E91E63; font-weight: bold;">${params[0].name}</div>
-            <div>告警数量: <span style="color: #FF9800;">${params[0].value}</span></div>
-          `
-        }
+        formatter: (params: any) => `
+          <div style="color: #E91E63; font-weight: bold;">告警数量: ${params[0].value}</div>
+        `
       },
       grid: {
         left: '3%',
@@ -382,15 +370,11 @@ const initCharts = () => {
       },
       xAxis: {
         type: 'category',
-        data: trendData.value.map((i) => i.date),
+        data: [], // 不显示日期数据
         axisLabel: {
-          color: 'rgba(255, 255, 255, 0.7)',
-          interval: 0,
-          rotate: 45
+          show: false // 隐藏横轴标签
         },
-        axisLine: {
-          lineStyle: { color: 'rgba(255, 255, 255, 0.2)' }
-        },
+        axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.2)' } },
         axisTick: { show: false }
       },
       yAxis: {
@@ -435,16 +419,17 @@ const initCharts = () => {
   }
 }
 
-// 全屏切换
+// 切换地图全屏模式
 const toggleFullScreen = () => {
   isMapFullScreen.value = !isMapFullScreen.value
   setTimeout(() => {
     if (charts.value[1]) {
-      charts.value[1].resize() // 只调整地图图表
+      charts.value[1].resize()
     }
-  }, 300) // 延迟调整图表大小以确保 DOM 更新
+  }, 300)
 }
-// 更新图表（增量更新）
+
+// 增量更新图表数据
 const updateCharts = () => {
   console.log('更新图表，charts:', charts.value.length, 'mapData:', mapData.value)
   if (charts.value[0] && districtData.value.length) {
@@ -486,7 +471,6 @@ const updateCharts = () => {
   if (charts.value[3] && trendData.value.length) {
     charts.value[3].setOption(
       {
-        xAxis: { data: trendData.value.map((i) => i.date) },
         series: [{ data: trendData.value.map((i) => i.count) }]
       },
       true
@@ -494,9 +478,9 @@ const updateCharts = () => {
   }
 }
 
-// 初始化 WebSocket
+// 初始化 WebSocket 连接
 const initWebSocket = () => {
-  const webSocket = new WebSocket('ws://localhost:8080/share-admin-api/ws/dashboard') // 确保端口与后端一致
+  const webSocket = new WebSocket('ws://localhost:8080/share-admin-api/ws/dashboard')
 
   webSocket.onopen = () => {
     console.log('✅ WebSocket 连接成功')
@@ -506,7 +490,6 @@ const initWebSocket = () => {
     console.log('📨 收到 WebSocket 消息:', event.data)
     try {
       const message = JSON.parse(event.data)
-      // 假设后端推送与 REST API 相同格式的数据
       if (message.type === 'dashboardData') {
         summary.value = message.summary || {}
         districtData.value = message.summary
@@ -522,9 +505,9 @@ const initWebSocket = () => {
         trendData.value = message.alarmTrend || []
 
         if (!charts.value.length) {
-          initCharts() // 初次初始化图表
+          initCharts()
         } else {
-          updateCharts() // 增量更新图表
+          updateCharts()
         }
       }
     } catch (error) {
@@ -535,16 +518,16 @@ const initWebSocket = () => {
   webSocket.onerror = (error) => {
     console.error('❌ WebSocket 错误:', error)
     webSocket?.close()
-    setTimeout(initWebSocket, 5000) // 5 秒后重连
+    setTimeout(initWebSocket, 5000)
   }
 
   webSocket.onclose = () => {
     console.log('🔌 WebSocket 连接关闭')
-    setTimeout(initWebSocket, 5000) // 5 秒后重连
+    setTimeout(initWebSocket, 5000)
   }
 }
 
-// 获取初始数据（通过 REST API）
+// 获取初始数据
 const fetchData = async () => {
   try {
     const districtResponse = await getDeviceDistrictStats()
@@ -571,30 +554,39 @@ const fetchData = async () => {
     console.log('告警趋势数据:', trendResponse)
     trendData.value = trendResponse.data || []
 
-    initCharts() // 初始化图表
+    initCharts()
   } catch (error) {
     console.error('获取初始数据失败:', error)
   }
 }
 
-// 组件生命周期
+// 组件生命周期钩子
 onMounted(() => {
   fetchData() // 初次加载数据
   initWebSocket() // 初始化 WebSocket
 
+  // 每10秒刷新数据
+  const refreshInterval = setInterval(() => {
+    fetchData()
+  }, 10000)
+
+  // 窗口大小变化时调整图表尺寸
   setTimeout(() => {
     window.addEventListener('resize', () => charts.value.forEach((c) => c.resize()))
   }, 500)
-})
 
-onBeforeUnmount(() => {
-  charts.value.forEach((c) => c.dispose())
-  charts.value = []
+  // 组件卸载时清理资源
+  onBeforeUnmount(() => {
+    clearInterval(refreshInterval) // 清除刷新定时器
+    charts.value.forEach((c) => c.dispose()) // 销毁图表
+    charts.value = []
+    window.removeEventListener('resize', () => charts.value.forEach((c) => c.resize()))
+  })
 })
 </script>
 
 <style scoped>
-/* 导入外部资源 */
+/* 导入外部字体 */
 @font-face {
   font-family: 'Inter';
   src: url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -643,7 +635,7 @@ onBeforeUnmount(() => {
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 15px -5px rgba(0, 0, 0, 0.2);
 }
 
 .screen-panel {
@@ -651,7 +643,7 @@ onBeforeUnmount(() => {
 }
 
 .screen-panel:hover {
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.2);
 }
 
 .screen-panel.full-screen {
@@ -681,12 +673,12 @@ onBeforeUnmount(() => {
   margin-top: 20px;
 }
 
-.rank-ul {
+.rank-list ul {
   list-style: none;
   padding: 0;
 }
 
-.rank-li {
+.rank-list li {
   display: flex;
   align-items: center;
   padding: 8px 0;
@@ -694,14 +686,14 @@ onBeforeUnmount(() => {
 }
 
 .rank-num {
-  width: 20px;
+  width: 40px;
   height: 20px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   margin-right: 10px;
 }
 

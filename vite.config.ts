@@ -97,12 +97,14 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       // 跨域代理配置
       proxy: {
         "/dev": {
-          target: "http://127.0.0.1:8081",
+          target: "http://81.68.235.20:8081",
+          // target:"http://127.0.0.1:8081",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/dev/, "")
         },
         "/share-admin-api":{
-          target: "http://127.0.0.1:8081",
+          target: "http://81.68.235.20:8081",
+          // target:"http://127.0.0.1:8081",
           changeOrigin: true,
         }
       }
