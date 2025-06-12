@@ -41,8 +41,6 @@ export namespace User {
   }
 }
 
-
-
 // * 获取单个用户
 export const getUserById = (id: number) => {
   return http.get<{ user: User.UserItem }>(`${_API}/users/${id}`)

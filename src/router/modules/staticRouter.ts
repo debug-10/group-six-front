@@ -140,9 +140,9 @@ export const staticRouter: RouteRecordRaw[] = [
           {
             path: '/statistics/tenant',
             name: 'statisticsTenant',
-            component: () => import('@/views/Statistics/Tenant.vue'),
+            component: () => import('@/views/IoT/Statistics/Device.vue'),
             meta: {
-              title: '租户统计',
+              title: '数据大屏',
               icon: 'PieChart'
             }
           }
