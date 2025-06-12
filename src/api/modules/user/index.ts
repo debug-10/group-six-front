@@ -39,6 +39,16 @@ export namespace User {
     role: number
     status: number
   }
+
+  // 用户更新参数接口
+  export interface UpdateUserParams {
+    username?: string
+    phone?: string
+    nickname?: string
+    avatarUrl?: string
+    role: number
+    password?: string
+  }
 }
 
 // * 获取单个用户
@@ -46,12 +56,16 @@ export const getUserById = (id: number) => {
   return http.get<{ user: User.UserItem }>(`${_API}/users/${id}`)
 }
 
-// * 更新用户
-export const updateUser = (id: number, data: User.UserSubmitParams) => {
-  return http.put<void>(`${_API}/users/${id}`, data)
+
+// 更新用户信息
+export const updateUser = (id: number, data: UserInfo.UpdateUserParams) => {
+  console.log('🚀 updateUser 请求:', `${_API}/users/${id}`, data)
+  return http.put<{ code: number; message: string }>(`${_API}/users/${id}`, data)
 }
 
-// * 删除用户
-export const deleteUser = (id: number) => {
-  return http.delete<void>(`${_API}/users/${id}`)
+// 切换用户状态
+export const toggleUserStatus = (id: number) => {
+  console.log('🚀 toggleUserStatus 请求:', `${_API}/users/status/${id}`)
+  return http.put<{ code: number; message: string }>(`${_API}/users/status/${id}`)
+
 }
