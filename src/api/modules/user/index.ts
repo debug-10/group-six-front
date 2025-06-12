@@ -24,6 +24,16 @@ export namespace UserInfo {
     password?: string
     submitPassword?: string
   }
+
+  // 用户更新参数接口
+  export interface UpdateUserParams {
+    username?: string
+    phone?: string
+    nickname?: string
+    avatarUrl?: string
+    role: number
+    password?: string
+  }
 }
 
 // 分页查询用户列表
@@ -81,22 +91,14 @@ export const addUser = (data: UserInfo.ReqUserParams) => {
   })
 }
 
-// 编辑用户
-export const editUser = (id: number, data: UserInfo.ReqUserParams) => {
-  return http.put<{ code: number; message: string }>(`${_API}/users/${id}`, data).then((res) => {
-    if (res.data.code !== 100) {
-      throw new Error(res.data.message || '编辑用户失败')
-    }
-    return res.data
-  })
+// 更新用户信息
+export const updateUser = (id: number, data: UserInfo.UpdateUserParams) => {
+  console.log('🚀 updateUser 请求:', `${_API}/users/${id}`, data)
+  return http.put<{ code: number; message: string }>(`${_API}/users/${id}`, data)
 }
 
-// 删除用户
-export const deleteUser = (id: number) => {
-  return http.delete<{ code: number; message: string }>(`${_API}/users/${id}`).then((res) => {
-    if (res.data.code !== 100) {
-      throw new Error(res.data.message || '删除用户失败')
-    }
-    return res.data
-  })
+// 切换用户状态
+export const toggleUserStatus = (id: number) => {
+  console.log('🚀 toggleUserStatus 请求:', `${_API}/users/status/${id}`)
+  return http.put<{ code: number; message: string }>(`${_API}/users/status/${id}`)
 }

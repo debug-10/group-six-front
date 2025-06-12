@@ -1,4 +1,3 @@
-<!-- src/views/IoT/Admin/AccountManage.vue -->
 <template>
   <div class="table-box" v-if="isMounted">
     <ProTable
@@ -16,23 +15,25 @@
       </template>
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-hasPermi="['sys:user:view']">查看</el-button>
-        <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <el-button type="danger" link :icon="Delete" @click="deleteUser(scope.row)">删除</el-button>
+        <el-button type="primary" link :icon="EditPen" @click="openUpdateDialog(scope.row)">编辑</el-button>
+        <el-button type="danger" link :icon="Delete" @click="handleToggleUserStatus(scope.row)">
+          {{ scope.row.status === 1 ? '禁用' : '启用' }}
+        </el-button>
       </template>
     </ProTable>
-    <UserDialog ref="dialogRef" :title="currentTitle" :api="currentApi" @refresh="refreshTable" />
+    <UpdateUserDialog v-model:visible="dialogVisible" @refresh="refreshTable" ref="updateDialog" />
   </div>
   <div v-else>组件加载中...</div>
 </template>
 
 <script setup lang="tsx">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus' // 新增 ElMessageBox 导入
 import { CirclePlus, View, EditPen, Delete } from '@element-plus/icons-vue'
 import { ColumnProps } from '@/components/ProTable/interface'
 import ProTable from '@/components/ProTable/index.vue'
-import UserDialog from './components/UserDialog.vue'
-import { UserInfo, getUserList, addUser, editUser, deleteUser } from '@/api/modules/user'
+import UpdateUserDialog from './components/UpdateUserDialog.vue'
+import { UserInfo, getUserList, addUser, updateUser, toggleUserStatus as toggleUserStatusApi } from '@/api/modules/user' // 重命名导入的函数
 
 // 调试加载状态
 const isMounted = ref(false)
@@ -173,6 +174,16 @@ const handleTableError = (error: any) => {
 // 表格列配置
 const columns: ColumnProps<UserInfo.ResUserList>[] = [
   { type: 'selection', fixed: 'left', width: 60 },
+  // 新增：用户ID列
+  {
+    prop: 'id',
+    label: '用户ID',
+    width: 0, // 设置宽度为0
+    fixed: 'left',
+    align: 'center',
+    render: (scope) => <span>{scope.row.id}</span>,
+    isShow: false
+  },
   {
     prop: 'avatarUrl',
     label: '头像',
@@ -215,32 +226,45 @@ const columns: ColumnProps<UserInfo.ResUserList>[] = [
   { prop: 'operation', label: '操作', fixed: 'right', width: 300 }
 ]
 
-// 对话框标题和API
-const currentTitle = ref<string>('')
-const currentApi = ref<(data: UserInfo.ReqUserParams) => Promise<any>>()
+// 编辑对话框引用
+const updateDialog = ref<InstanceType<typeof UpdateUserDialog>>()
+const dialogVisible = ref(false)
 
-// 打开对话框
-const dialogRef = ref<InstanceType<typeof UserDialog>>()
-const openDrawer = (title: string, row?: UserInfo.ResUserList) => {
-  currentTitle.value = title
-  currentApi.value = title === '新增' ? addUser : (data: UserInfo.ReqUserParams) => editUser(row!.id, data)
-  dialogRef.value?.open({
-    title,
-    row: row || {},
-    api: currentApi.value
+// 打开新增对话框
+const openDrawer = () => {
+  updateDialog.value?.open({
+    title: '新增',
+    api: (id: number, data: UserInfo.UpdateUserParams) => addUser(data),
+    showPassword: true
   })
+  dialogVisible.value = true
 }
 
-// 删除用户
-const deleteUser = async (row: UserInfo.ResUserList) => {
+const openUpdateDialog = (row: UserInfo.ResUserList) => {
+  console.log('传递给对话框的用户数据:', row) // 添加日志输出
+  updateDialog.value?.open({
+    title: '编辑',
+    row,
+    api: (id: number, data: UserInfo.UpdateUserParams) => updateUser(id, data),
+    showPassword: false
+  })
+  dialogVisible.value = true
+}
+
+// 切换用户状态 - 修改后的函数
+const handleToggleUserStatus = async (row: UserInfo.ResUserList) => {
   try {
-    await ElMessage.confirm(`确认删除用户【${row.username}】？`, '提示', { type: 'warning' })
-    await deleteUser(row.id)
-    ElMessage.success('删除成功')
+    // 使用 ElMessageBox 而不是 ElMessage
+    await ElMessageBox.confirm(`确认${row.status === 1 ? '禁用' : '启用'}用户【${row.username}】？`, '提示', { type: 'warning' })
+
+    // 调用重命名后的 API 函数，避免递归
+    await toggleUserStatusApi(row.id)
+
+    ElMessage.success(`${row.status === 1 ? '禁用' : '启用'}成功`)
     proTable.value?.getTableList()
   } catch (error: any) {
-    ElMessage.error(error.response?.data?.message || '删除失败')
-    console.error('删除用户失败:', error)
+    ElMessage.error(error.response?.data?.message || `${row.status === 1 ? '禁用' : '启用'}失败`)
+    console.error(`${row.status === 1 ? '禁用' : '启用'}用户失败:`, error)
   }
 }
 
