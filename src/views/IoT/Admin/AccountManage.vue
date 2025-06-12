@@ -1,41 +1,35 @@
-<!-- src/views/IoT/Admin/AccountManage.vue -->
 <template>
   <div class="table-box" v-if="isMounted">
-    <ProTable
-      ref="proTable"
-      title="用户管理列表"
-      :columns="columns"
-      :requestApi="getTableList"
-      :initParam="initParam"
-      :dataCallback="dataCallback"
-      :search-params="searchParams"
-      @error="handleTableError"
-    >
+    <ProTable ref="proTable" title="用户管理列表" :columns="columns" :requestApi="getUserListApi" :initParam="initParams" :search-params="searchParams" @error="handleTableError">
       <template #tableHeader>
-        <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')" v-hasPermi="['sys:user:add']">新增用户</el-button>
+        <el-button type="primary" :icon="CirclePlus" @click="openUserDialog('新增')" v-hasPermi="['sys:user:add']"> 新增用户 </el-button>
       </template>
+
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-hasPermi="['sys:user:view']">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
         <el-button type="danger" link :icon="Delete" @click="deleteUser(scope.row)">删除</el-button>
+
       </template>
     </ProTable>
-    <UserDialog ref="dialogRef" :title="currentTitle" :api="currentApi" @refresh="refreshTable" />
+
+    <UserDialog ref="dialogRef" :title="dialogTitle" :api="dialogApi" @refresh="refreshTable" />
   </div>
   <div v-else>组件加载中...</div>
 </template>
 
 <script setup lang="tsx">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { CirclePlus, View, EditPen, Delete } from '@element-plus/icons-vue'
-import { ColumnProps } from '@/components/ProTable/interface'
 import ProTable from '@/components/ProTable/index.vue'
+import { ColumnProps } from '@/components/ProTable/interface'
 import UserDialog from './components/UserDialog.vue'
-import { UserInfo, getUserList, addUser, editUser, deleteUser } from '@/api/modules/user'
+import { getUserList, createUser, updateUser, deleteUser as removeUser, User } from '@/api/modules/user/index'
 
-// 调试加载状态
 const isMounted = ref(false)
+const proTable = ref<InstanceType<typeof ProTable>>()
+const dialogRef = ref<InstanceType<typeof UserDialog>>()
 
 // 新增：创建数据缓存对象
 const dataCache = ref({
@@ -44,9 +38,9 @@ const dataCache = ref({
 })
 
 onMounted(() => {
-  console.log('AccountManage.vue 已挂载')
   isMounted.value = true
 })
+
 
 // 表格实例
 const proTable = ref<InstanceType<typeof ProTable>>()
@@ -96,10 +90,14 @@ const getTableList = async (params: any) => {
       status?: number
       role?: number
     } = {
+
       page: Number(params.page) || 1,
-      limit: Number(params.limit) || 20,
-      role: Number(initParam.role) || undefined
+      limit: Number(params.limit) || 10,
+      username: searchParams.username?.trim() || undefined,
+      phone: searchParams.phone?.trim() || undefined,
+      status: searchParams.status !== undefined ? searchParams.status : undefined
     }
+    const res = await getUserList(query)
 
     if (searchParams.status !== undefined && searchParams.status !== null) {
       requestParams.status = Number(searchParams.status)
@@ -161,23 +159,21 @@ const getTableList = async (params: any) => {
     console.log('错误时返回的默认数据:', defaultData)
     console.groupEnd() // 🛑 getTableList 错误捕获
     return defaultData
+
   }
 }
 
-// 处理表格错误
-const handleTableError = (error: any) => {
-  ElMessage.error(error.response?.data?.message || '加载用户列表失败，请检查网络或刷新页面')
-  console.error('ProTable 错误:', error)
+const handleTableError = (err: any) => {
+  ElMessage.error(err.response?.data?.message || '表格加载失败')
 }
 
-// 表格列配置
-const columns: ColumnProps<UserInfo.ResUserList>[] = [
+const columns: ColumnProps<User.UserItem>[] = [
   { type: 'selection', fixed: 'left', width: 60 },
   {
     prop: 'avatarUrl',
     label: '头像',
-    width: 120,
-    render: (scope) => <el-avatar shape="square" size={32} src={scope.row.avatarUrl || '/default-avatar.png'} />
+    width: 100,
+    render: ({ row }) => <el-avatar size={32} src={row.avatarUrl || '/default-avatar.png'} />
   },
   {
     prop: 'username',
@@ -198,53 +194,43 @@ const columns: ColumnProps<UserInfo.ResUserList>[] = [
     prop: 'status',
     label: '状态',
     width: 100,
-    render: (scope) => <el-tag type={scope.row.status === 1 ? 'success' : 'danger'}>{scope.row.status === 1 ? '启用' : '禁用'}</el-tag>
+    render: ({ row }) => <el-tag type={row.status === 1 ? 'success' : 'danger'}>{row.status === 1 ? '启用' : '禁用'}</el-tag>
   },
   {
     prop: 'createTime',
     label: '创建时间',
     width: 180,
-    render: (scope) => <span>{scope.row.createTime?.split('T')[0]}</span>
+    render: ({ row }) => <span>{row.createTime?.split('T')[0]}</span>
   },
   {
     prop: 'updateTime',
     label: '更新时间',
     width: 180,
-    render: (scope) => <span>{scope.row.updateTime?.split('T')[0]}</span>
+    render: ({ row }) => <span>{row.updateTime?.split('T')[0]}</span>
   },
   { prop: 'operation', label: '操作', fixed: 'right', width: 300 }
 ]
 
-// 对话框标题和API
-const currentTitle = ref<string>('')
-const currentApi = ref<(data: UserInfo.ReqUserParams) => Promise<any>>()
+const dialogTitle = ref('')
+const dialogApi = ref<(data: User.UserSubmitParams) => Promise<any>>()
 
-// 打开对话框
-const dialogRef = ref<InstanceType<typeof UserDialog>>()
-const openDrawer = (title: string, row?: UserInfo.ResUserList) => {
-  currentTitle.value = title
-  currentApi.value = title === '新增' ? addUser : (data: UserInfo.ReqUserParams) => editUser(row!.id, data)
-  dialogRef.value?.open({
-    title,
-    row: row || {},
-    api: currentApi.value
-  })
+const openUserDialog = (title: string, row?: User.UserItem) => {
+  dialogTitle.value = title
+  dialogApi.value = title === '新增' ? createUser : (data) => updateUser(row!.id, data)
+  dialogRef.value?.open({ title, row: row || {}, api: dialogApi.value })
 }
 
-// 删除用户
-const deleteUser = async (row: UserInfo.ResUserList) => {
+const handleDelete = async (row: User.UserItem) => {
   try {
-    await ElMessage.confirm(`确认删除用户【${row.username}】？`, '提示', { type: 'warning' })
-    await deleteUser(row.id)
+    await ElMessageBox.confirm(`确认删除用户【${row.username}】？`, '提示', { type: 'warning' })
+    await removeUser(row.id)
     ElMessage.success('删除成功')
-    proTable.value?.getTableList()
-  } catch (error: any) {
-    ElMessage.error(error.response?.data?.message || '删除失败')
-    console.error('删除用户失败:', error)
+    refreshTable()
+  } catch (err: any) {
+    ElMessage.error(err.response?.data?.message || '删除失败')
   }
 }
 
-// 刷新表格
 const refreshTable = () => {
   proTable.value?.getTableList()
 }
@@ -255,6 +241,6 @@ const refreshTable = () => {
   padding: 20px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 </style>
