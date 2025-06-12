@@ -1,20 +1,13 @@
 <template>
   <div class="table-box" v-if="isMounted">
-    <ProTable
-      ref="proTable"
-      title="用户管理列表"
-      :columns="columns"
-      :requestApi="getTableList"
-      :initParam="initParam"
-      :dataCallback="dataCallback"
-      :search-params="searchParams"
-      @error="handleTableError"
-    >
+    <ProTable ref="proTable" title="用户管理列表" :columns="columns" :requestApi="getUserListApi" :initParam="initParams" :search-params="searchParams" @error="handleTableError">
       <template #tableHeader>
-        <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')" v-hasPermi="['sys:user:add']">新增用户</el-button>
+        <el-button type="primary" :icon="CirclePlus" @click="openUserDialog('新增')" v-hasPermi="['sys:user:add']"> 新增用户 </el-button>
       </template>
+
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-hasPermi="['sys:user:view']">查看</el-button>
+
         <el-button type="primary" link :icon="EditPen" @click="openUpdateDialog(scope.row)">编辑</el-button>
         <el-button type="danger" link :icon="Delete" @click="handleToggleUserStatus(scope.row)">
           {{ scope.row.status === 1 ? '禁用' : '启用' }}
@@ -22,21 +15,25 @@
       </template>
     </ProTable>
     <UpdateUserDialog v-model:visible="dialogVisible" @refresh="refreshTable" ref="updateDialog" />
+
   </div>
   <div v-else>组件加载中...</div>
 </template>
 
 <script setup lang="tsx">
 import { ref, reactive, onMounted } from 'vue'
+
 import { ElMessage, ElMessageBox } from 'element-plus' // 新增 ElMessageBox 导入
+
 import { CirclePlus, View, EditPen, Delete } from '@element-plus/icons-vue'
-import { ColumnProps } from '@/components/ProTable/interface'
-import ProTable from '@/components/ProTable/index.vue'
+
 import UpdateUserDialog from './components/UpdateUserDialog.vue'
 import { UserInfo, getUserList, addUser, updateUser, toggleUserStatus as toggleUserStatusApi } from '@/api/modules/user' // 重命名导入的函数
 
-// 调试加载状态
+
 const isMounted = ref(false)
+const proTable = ref<InstanceType<typeof ProTable>>()
+const dialogRef = ref<InstanceType<typeof UserDialog>>()
 
 // 新增：创建数据缓存对象
 const dataCache = ref({
@@ -45,9 +42,9 @@ const dataCache = ref({
 })
 
 onMounted(() => {
-  console.log('AccountManage.vue 已挂载')
   isMounted.value = true
 })
+
 
 // 表格实例
 const proTable = ref<InstanceType<typeof ProTable>>()
@@ -97,10 +94,14 @@ const getTableList = async (params: any) => {
       status?: number
       role?: number
     } = {
+
       page: Number(params.page) || 1,
-      limit: Number(params.limit) || 20,
-      role: Number(initParam.role) || undefined
+      limit: Number(params.limit) || 10,
+      username: searchParams.username?.trim() || undefined,
+      phone: searchParams.phone?.trim() || undefined,
+      status: searchParams.status !== undefined ? searchParams.status : undefined
     }
+    const res = await getUserList(query)
 
     if (searchParams.status !== undefined && searchParams.status !== null) {
       requestParams.status = Number(searchParams.status)
@@ -162,17 +163,15 @@ const getTableList = async (params: any) => {
     console.log('错误时返回的默认数据:', defaultData)
     console.groupEnd() // 🛑 getTableList 错误捕获
     return defaultData
+
   }
 }
 
-// 处理表格错误
-const handleTableError = (error: any) => {
-  ElMessage.error(error.response?.data?.message || '加载用户列表失败，请检查网络或刷新页面')
-  console.error('ProTable 错误:', error)
+const handleTableError = (err: any) => {
+  ElMessage.error(err.response?.data?.message || '表格加载失败')
 }
 
-// 表格列配置
-const columns: ColumnProps<UserInfo.ResUserList>[] = [
+const columns: ColumnProps<User.UserItem>[] = [
   { type: 'selection', fixed: 'left', width: 60 },
   // 新增：用户ID列
   {
@@ -187,8 +186,8 @@ const columns: ColumnProps<UserInfo.ResUserList>[] = [
   {
     prop: 'avatarUrl',
     label: '头像',
-    width: 120,
-    render: (scope) => <el-avatar shape="square" size={32} src={scope.row.avatarUrl || '/default-avatar.png'} />
+    width: 100,
+    render: ({ row }) => <el-avatar size={32} src={row.avatarUrl || '/default-avatar.png'} />
   },
   {
     prop: 'username',
@@ -209,22 +208,23 @@ const columns: ColumnProps<UserInfo.ResUserList>[] = [
     prop: 'status',
     label: '状态',
     width: 100,
-    render: (scope) => <el-tag type={scope.row.status === 1 ? 'success' : 'danger'}>{scope.row.status === 1 ? '启用' : '禁用'}</el-tag>
+    render: ({ row }) => <el-tag type={row.status === 1 ? 'success' : 'danger'}>{row.status === 1 ? '启用' : '禁用'}</el-tag>
   },
   {
     prop: 'createTime',
     label: '创建时间',
     width: 180,
-    render: (scope) => <span>{scope.row.createTime?.split('T')[0]}</span>
+    render: ({ row }) => <span>{row.createTime?.split('T')[0]}</span>
   },
   {
     prop: 'updateTime',
     label: '更新时间',
     width: 180,
-    render: (scope) => <span>{scope.row.updateTime?.split('T')[0]}</span>
+    render: ({ row }) => <span>{row.updateTime?.split('T')[0]}</span>
   },
   { prop: 'operation', label: '操作', fixed: 'right', width: 300 }
 ]
+
 
 // 编辑对话框引用
 const updateDialog = ref<InstanceType<typeof UpdateUserDialog>>()
@@ -265,10 +265,10 @@ const handleToggleUserStatus = async (row: UserInfo.ResUserList) => {
   } catch (error: any) {
     ElMessage.error(error.response?.data?.message || `${row.status === 1 ? '禁用' : '启用'}失败`)
     console.error(`${row.status === 1 ? '禁用' : '启用'}用户失败:`, error)
+
   }
 }
 
-// 刷新表格
 const refreshTable = () => {
   proTable.value?.getTableList()
 }
@@ -279,6 +279,6 @@ const refreshTable = () => {
   padding: 20px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 </style>

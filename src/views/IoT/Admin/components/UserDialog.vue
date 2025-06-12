@@ -40,7 +40,7 @@
 import { ref, reactive, watch } from 'vue'
 import { ElMessage, FormInstance } from 'element-plus'
 import { Dialog } from '@/components/Dialog'
-import { UserInfo } from '@/api/modules/user'
+import { UserInfo } from '@/api/modules/user/index'
 
 interface DialogProps {
   title: string

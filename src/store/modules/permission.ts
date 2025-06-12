@@ -36,44 +36,44 @@ const PLATFORM_CONFIGS = {
           }
         ]
       },
-      {
-        path: '/platform',
-        name: 'platform',
-        component: 'Layout',
-        meta: {
-          title: '平台管理',
-          icon: 'Platform',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        },
-        children: [
-          {
-            path: '/platform/version',
-            name: 'platformVersion',
-            component: '/Platform/Version',
-            meta: {
-              title: '版本管理',
-              icon: 'Document',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/platform/protocol',
-            name: 'protocol',
-            component: '/Platform/ProtocolView',
-            meta: {
-              title: '协议管理',
-              icon: 'Document',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          }
-        ]
-      },
+      // {
+      //   path: '/platform',
+      //   name: 'platform',
+      //   component: 'Layout',
+      //   meta: {
+      //     title: '平台管理',
+      //     icon: 'Platform',
+      //     isHide: false,
+      //     isAffix: false,
+      //     isKeepAlive: true
+      //   },
+      //   children: [
+      //     {
+      //       path: '/platform/version',
+      //       name: 'platformVersion',
+      //       component: '/Platform/Version',
+      //       meta: {
+      //         title: '版本管理',
+      //         icon: 'Document',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     },
+      //     {
+      //       path: '/platform/protocol',
+      //       name: 'protocol',
+      //       component: '/Platform/ProtocolView',
+      //       meta: {
+      //         title: '协议管理',
+      //         icon: 'Document',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     }
+      //   ]
+      // },
       {
         path: '/tenant',
         name: 'tenant',
@@ -161,53 +161,53 @@ const PLATFORM_CONFIGS = {
         },
         children: [
           {
-            path: '/statistics/station',
+            path: '/statistics/tenant',
             name: 'stationStats',
             component: '/Statistics/StationStats',
             meta: {
-              title: '驿站统计',
+              title: '数据大屏',
               icon: 'PieChart',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/statistics/device',
-            name: 'deviceStats',
-            component: '/Statistics/DeviceStats',
-            meta: {
-              title: '设备统计',
-              icon: 'PieChart',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/statistics/user',
-            name: 'userStats',
-            component: '/Statistics/UserStats',
-            meta: {
-              title: '用户统计',
-              icon: 'PieChart',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/statistics/alarm',
-            name: 'alarmStats',
-            component: '/Statistics/AlarmStats',
-            meta: {
-              title: '告警统计',
-              icon: 'Warning',
               isHide: false,
               isAffix: false,
               isKeepAlive: true
             }
           }
+          // {
+          //   path: '/statistics/device',
+          //   name: 'deviceStats',
+          //   component: '/Statistics/DeviceStats',
+          //   meta: {
+          //     title: '设备统计',
+          //     icon: 'PieChart',
+          //     isHide: false,
+          //     isAffix: false,
+          //     isKeepAlive: true
+          //   }
+          // },
+          // {
+          //   path: '/statistics/user',
+          //   name: 'userStats',
+          //   component: '/Statistics/UserStats',
+          //   meta: {
+          //     title: '用户统计',
+          //     icon: 'PieChart',
+          //     isHide: false,
+          //     isAffix: false,
+          //     isKeepAlive: true
+          //   }
+          // },
+          // {
+          //   path: '/statistics/alarm',
+          //   name: 'alarmStats',
+          //   component: '/Statistics/AlarmStats',
+          //   meta: {
+          //     title: '告警统计',
+          //     icon: 'Warning',
+          //     isHide: false,
+          //     isAffix: false,
+          //     isKeepAlive: true
+          //   }
+          // }
         ]
       }
       // {
@@ -319,58 +319,58 @@ const PLATFORM_CONFIGS = {
           isAffix: false,
           isKeepAlive: true
         }
-      },
-      // 统计管理
-      {
-        path: '/iot-statistics',
-        name: 'iotStatistics',
-        component: 'Layout',
-        meta: {
-          title: '统计管理',
-          icon: 'DataAnalysis',
-          isHide: false,
-          isAffix: false,
-          isKeepAlive: true
-        },
-        children: [
-          {
-            path: '/iot/statistics/device',
-            name: 'iotDeviceStats',
-            component: '/IoTStatistics/DeviceStats',
-            meta: {
-              title: '设备统计',
-              icon: 'PieChart',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/iot-statistics/user',
-            name: 'iotUserStats',
-            component: '/IoTStatistics/UserStats',
-            meta: {
-              title: '用户统计',
-              icon: 'PieChart',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          },
-          {
-            path: '/iot-statistics/alarm',
-            name: 'iotAlarmStats',
-            component: '/IoTStatistics/AlarmStats',
-            meta: {
-              title: '告警统计',
-              icon: 'Warning',
-              isHide: false,
-              isAffix: false,
-              isKeepAlive: true
-            }
-          }
-        ]
       }
+      // 统计管理
+      // {
+      //   path: '/iot-statistics',
+      //   name: 'iotStatistics',
+      //   component: 'Layout',
+      //   meta: {
+      //     title: '统计管理',
+      //     icon: 'DataAnalysis',
+      //     isHide: false,
+      //     isAffix: false,
+      //     isKeepAlive: true
+      //   },
+      //   children: [
+      //     {
+      //       path: '/iot/statistics/device',
+      //       name: 'iotDeviceStats',
+      //       component: '/IoTStatistics/DeviceStats',
+      //       meta: {
+      //         title: '设备统计',
+      //         icon: 'PieChart',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     },
+      //     {
+      //       path: '/iot-statistics/user',
+      //       name: 'iotUserStats',
+      //       component: '/IoTStatistics/UserStats',
+      //       meta: {
+      //         title: '用户统计',
+      //         icon: 'PieChart',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     },
+      //     {
+      //       path: '/iot-statistics/alarm',
+      //       name: 'iotAlarmStats',
+      //       component: '/IoTStatistics/AlarmStats',
+      //       meta: {
+      //         title: '告警统计',
+      //         icon: 'Warning',
+      //         isHide: false,
+      //         isAffix: false,
+      //         isKeepAlive: true
+      //       }
+      //     }
+      //   ]
+      // }
     ],
     buttonList: []
   }
