@@ -28,21 +28,45 @@ export namespace UserInfo {
 
 // 分页查询用户列表
 export const getUserList = (params: any) => {
-  console.log('getUserList 发送参数:', params) // 调试请求参数
+  // 打印发送的参数
+  console.log('🚀 getUserList 发送参数:', params)
+
   return http
     .get<{
-      code: number
+      code: string
       message: string
-      data: { users: UserInfo.ResUserList[]; pagination: { total: number; page: number; limit: number } }
-    }>(`${_API}/users/userInfo`, { params })
-    .then((res) => {
-      if (res.data.code !== 100) {
-        throw new Error(res.data.message || '获取用户列表失败')
+      data: {
+        users: UserInfo.ResUserList[]
+        pagination: { total: number; page: number; limit: number }
       }
-      return res.data.data // 返回 { users, pagination }
+    }>(`${_API}/users`, params)
+    .then((res) => {
+      // 打印完整的响应对象
+      console.log('🔍 getUserList 响应对象 res:', res)
+
+      // 打印响应中的 code 和 msg
+      console.log('🔍 getUserList 响应 code:', res.code)
+      console.log('🔍 getUserList 响应 msg:', res.msg)
+
+      // 打印响应中的 data 结构
+      console.log('🔍 getUserList 响应 data:', res.data)
+
+      // 打印即将返回的 data.data（注意：这里可能存在层级问题）
+      console.log('🔍 getUserList 返回的数据:', res.data.data)
+
+      return res.data // 返回 { users, pagination }
     })
     .catch((error) => {
-      console.error('getUserList 错误:', error.response?.data?.message || error.message)
+      // 打印错误信息
+      console.error('🛑 getUserList 错误捕获:', {
+        message: error.message,
+        responseData: error.response?.data,
+        responseStatus: error.response?.status
+      })
+
+      // 打印完整的错误对象
+      console.error('🛑 getUserList 错误对象:', error)
+
       throw error
     })
 }

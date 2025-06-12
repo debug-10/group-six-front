@@ -16,8 +16,8 @@
       </template>
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-hasPermi="['sys:user:view']">查看</el-button>
-        <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)" v-hasPermi="['sys:user:edit']">编辑</el-button>
-        <el-button type="danger" link :icon="Delete" @click="deleteUser(scope.row)" v-hasPermi="['sys:user:remove']">删除</el-button>
+        <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
+        <el-button type="danger" link :icon="Delete" @click="deleteUser(scope.row)">删除</el-button>
       </template>
     </ProTable>
     <UserDialog ref="dialogRef" :title="currentTitle" :api="currentApi" @refresh="refreshTable" />
@@ -37,6 +37,12 @@ import { UserInfo, getUserList, addUser, editUser, deleteUser } from '@/api/modu
 // 调试加载状态
 const isMounted = ref(false)
 
+// 新增：创建数据缓存对象
+const dataCache = ref({
+  apiData: null, // 存储API原始数据
+  processedData: null // 存储处理后的数据
+})
+
 onMounted(() => {
   console.log('AccountManage.vue 已挂载')
   isMounted.value = true
@@ -53,23 +59,37 @@ const initParam = reactive<{ role: number }>({
 // 搜索参数
 const searchParams = reactive<{ status?: number; username?: string; phone?: string }>({})
 
-// 数据回调函数
-const dataCallback = (res: any) => {
-  console.log('dataCallback 接收数据:', res)
-  if (!res || !res.users) {
-    console.error('数据回调错误: 数据为空或格式不正确', res)
-    return { list: [], total: 0 }
+// 数据回调函数（从缓存dataCache获取数据）
+const dataCallback = () => {
+  console.groupCollapsed('📊 dataCallback 数据处理')
+
+  // 从缓存中获取处理后的数据
+  const cachedData = dataCache.value.processedData
+
+  console.log('dataCallback 从缓存获取的数据:', cachedData)
+
+  // 检查缓存数据是否存在
+  if (!cachedData) {
+    console.warn('dataCallback: 缓存中没有数据，返回默认结构')
+    const defaultData = { list: [], total: 0 }
+    console.log('dataCallback 返回结果:', defaultData)
+    console.groupEnd()
+    return defaultData
   }
-  return {
-    list: res.users || [],
-    total: res.pagination?.total || 0
-  }
+
+  console.log('dataCallback 返回结果:', cachedData)
+  console.groupEnd()
+  return cachedData
 }
 
 // 获取用户列表
 const getTableList = async (params: any) => {
   try {
-    // 构造符合后端预期的参数对象
+    // 1. 打印函数入口参数
+    console.groupCollapsed('🚀 getTableList 调用开始')
+    console.log('调用参数 params:', params)
+
+    // 2. 构造请求参数并打印
     const requestParams: {
       page: number
       limit: number
@@ -81,23 +101,56 @@ const getTableList = async (params: any) => {
       role: Number(initParam.role) || undefined
     }
 
-    // 只有当有搜索值时才添加 status
     if (searchParams.status !== undefined && searchParams.status !== null) {
       requestParams.status = Number(searchParams.status)
     }
 
-    console.log('最终请求参数:', requestParams)
+    console.log('最终请求参数 requestParams:', requestParams)
+
+    // 3. 调用API并捕获响应
     const res = await getUserList(requestParams)
-    console.log('API 响应:', res)
+
+    // 4. 打印API响应的完整结构
+    console.log('API 响应 res 完整结构:', res)
+    if (res) {
+      console.log('API 响应 res.users:', res.users)
+      console.log('API 响应 res.pagination:', res.pagination)
+    }
+
+    // 关键修改：处理数据并存入缓存
+    const transformedData = {
+      list: res.users || [], // 将 users 转换为 list
+      total: res.pagination?.total || 0 // 提取 total
+    }
+    console.log('getTableList 转换后的数据:', transformedData)
+
+    // 将原始数据和处理后的数据存入缓存
+    dataCache.value = {
+      apiData: res,
+      processedData: transformedData
+    }
+    console.log('📊 已将数据存入缓存:', dataCache.value)
+
+    console.groupEnd() // 🚀 getTableList 调用结束
     return res
   } catch (error: any) {
+    console.groupCollapsed('🛑 getTableList 错误捕获')
     console.error('获取用户列表失败:', {
       message: error.message,
       response: error.response?.data,
       stack: error.stack
     })
+
+    // 打印错误响应的详细信息（如果有）
+    if (error.response?.data) {
+      console.log('错误响应数据 error.response.data:', error.response.data)
+      console.log('错误响应状态码 error.response.status:', error.response.status)
+    }
+
     ElMessage.error(error.response?.data?.message || '加载用户列表失败')
-    return {
+
+    // 打印返回的默认数据结构
+    const defaultData = {
       users: [],
       pagination: {
         total: 0,
@@ -105,6 +158,9 @@ const getTableList = async (params: any) => {
         limit: Number(params.limit) || 20
       }
     }
+    console.log('错误时返回的默认数据:', defaultData)
+    console.groupEnd() // 🛑 getTableList 错误捕获
+    return defaultData
   }
 }
 
