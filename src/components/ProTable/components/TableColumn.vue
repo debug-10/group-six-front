@@ -32,8 +32,14 @@ const RenderTableColumn = (item: ColumnProps) => {
         <el-table-column {...item} align={item.align ?? 'center'} showOverflowTooltip={item.showOverflowTooltip ?? item.prop !== 'operation'}>
           {{
             default: (scope: RenderScope<any>) => {
+              console.log('当前列的 prop:', item.prop) // 新增日志，查看prop值
               if (item._children) return item._children.map((child) => RenderTableColumn(child))
               if (item.render) return item.render(scope)
+              // 关键修改：添加对 operation 插槽的直接支持
+              if (item.prop === 'operation' && slots.operation) {
+                return slots.operation!(scope)
+              }
+              console.log('检查 operation 插槽:', item.prop === 'operation', slots.operation)
               if (slots[handleProp(item.prop!)]) return slots[handleProp(item.prop!)]!(scope)
               if (item.tag) return <el-tag type={getTagType(item, scope)}>{renderCellData(item, scope)}</el-tag>
               return renderCellData(item, scope)

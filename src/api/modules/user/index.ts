@@ -41,18 +41,7 @@ export namespace User {
   }
 }
 
-// * 创建用户
-export const createUser = (data: User.UserSubmitParams) => {
-  return http.post<{ user_id: number }>(_API + '/users', data)
-}
 
-// * 分页查询用户列表
-export const getUserList = (params: User.UserQueryParams) => {
-  return http.get<{
-    users: User.UserItem[]
-    pagination: { total: number; page: number; limit: number }
-  }>(_API + '/users', params)
-}
 
 // * 获取单个用户
 export const getUserById = (id: number) => {
